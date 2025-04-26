@@ -77,7 +77,7 @@ class SlackMonitor:
             }
             
             # Get initial history to establish latest timestamp
-            history = self.client.conversations_history(channel=channel_id, limit=10)
+            history = self.client.conversations_history(channel=channel_id, limit=50)  # Increased limit to get more past messages
             messages = history.get("messages", [])
             
             if messages:
@@ -87,7 +87,18 @@ class SlackMonitor:
                 self.message_cache[channel_id] = messages
                 
                 # Log info about channel
-                logger.info(f"Added channel #{channel_info.get('name')} ({channel_id}) with {len(messages)} initial messages")
+                channel_name = channel_info.get('name')
+                logger.info(f"Added channel #{channel_name} ({channel_id}) with {len(messages)} initial messages")
+                
+                # Print past messages
+                print(f"\n===== PAST MESSAGES FROM CHANNEL #{channel_name} =====")
+                for msg in messages:
+                    user = msg.get('user', 'Unknown')
+                    text = msg.get('text', 'No text')
+                    ts = msg.get('ts', 'Unknown time')
+                    print(f"[{ts}] User: {user}")
+                    print(f"Message: {text}")
+                    print("-" * 50)
                 
                 # Process any existing threads
                 await self._process_threads(channel_id, messages)
@@ -175,7 +186,18 @@ class SlackMonitor:
                     new_messages = [msg for msg in messages if msg.get("ts") != latest_ts]
                     
                     if new_messages:
-                        logger.info(f"Found {len(new_messages)} new messages in #{self.monitored_channels[channel_id]['name']}")
+                        channel_name = self.monitored_channels[channel_id]['name']
+                        logger.info(f"Found {len(new_messages)} new messages in #{channel_name}")
+                        
+                        # Print each message content
+                        print(f"\n===== NEW MESSAGES IN CHANNEL #{channel_name} =====")
+                        for msg in new_messages:
+                            user = msg.get('user', 'Unknown')
+                            text = msg.get('text', 'No text')
+                            ts = msg.get('ts', 'Unknown time')
+                            print(f"[{ts}] User: {user}")
+                            print(f"Message: {text}")
+                            print("-" * 50)
                         
                         # Add to our message cache (prepend to keep chronological order)
                         self.message_cache[channel_id] = new_messages + self.message_cache[channel_id]
@@ -267,6 +289,45 @@ class SlackMonitor:
             }
             for cid, info in self.monitored_channels.items()
         }
+        
+    def print_all_channel_messages(self, channel_id: str = None) -> None:
+        """
+        Print all cached messages for a channel or all channels
+        
+        Args:
+            channel_id: Optional specific channel ID to print, or None for all channels
+        """
+        if channel_id:
+            # Print messages for specific channel
+            if channel_id in self.message_cache:
+                channel_name = self.monitored_channels[channel_id]['name']
+                messages = self.message_cache[channel_id]
+                
+                print(f"\n===== ALL MESSAGES FROM CHANNEL #{channel_name} ({len(messages)} messages) =====")
+                for msg in messages:
+                    user = msg.get('user', 'Unknown')
+                    text = msg.get('text', 'No text')
+                    ts = msg.get('ts', 'Unknown time')
+                    print(f"[{ts}] User: {user}")
+                    print(f"Message: {text}")
+                    print("-" * 50)
+            else:
+                print(f"No messages found for channel {channel_id}")
+        else:
+            # Print messages for all channels
+            for cid, info in self.monitored_channels.items():
+                if cid in self.message_cache:
+                    channel_name = info['name']
+                    messages = self.message_cache[cid]
+                    
+                    print(f"\n===== ALL MESSAGES FROM CHANNEL #{channel_name} ({len(messages)} messages) =====")
+                    for msg in messages:
+                        user = msg.get('user', 'Unknown')
+                        text = msg.get('text', 'No text')
+                        ts = msg.get('ts', 'Unknown time')
+                        print(f"[{ts}] User: {user}")
+                        print(f"Message: {text}")
+                        print("-" * 50)
 
 # Create a singleton instance
 slack_monitor = SlackMonitor()
@@ -301,6 +362,11 @@ if __name__ == "__main__":
     print("Press Ctrl+C to stop")
     
     try:
-        asyncio.run(start_monitor([channel], interval))
+        # Setup the monitor and channels
+        monitor = SlackMonitor()
+        asyncio.run(monitor.add_channel(channel))
+        
+        # Then start monitoring
+        asyncio.run(monitor.start_monitoring(interval=interval))
     except KeyboardInterrupt:
         print("\nMonitoring stopped") 

@@ -32,7 +32,7 @@ async def startup_event():
         
         # Define channels to monitor - you can customize this list
         # You can use channel names or IDs
-        channels_to_monitor = ["all-devatlas"]  # Replace with your channel names
+        channels_to_monitor = ["all-devatlas", "project-lahacks"]  # Replace with your channel names
         
         # Define polling interval in seconds
         polling_interval = 30  # Check for new messages every 30 seconds
@@ -76,6 +76,21 @@ async def get_monitored_channel_history(channel_id: str, limit: int = 100):
         "message_count": len(messages),
         "messages": messages
     }
+
+@app.get("/slack/print-messages/{channel_id}")
+async def print_channel_messages(channel_id: str = None):
+    """Print all messages for a channel to the console"""
+    try:
+        if channel_id == "all":
+            # Print messages for all channels
+            slack_monitor.print_all_channel_messages()
+            return {"status": "success", "message": "Printed all messages from all channels to console"}
+        else:
+            # Print messages for specific channel
+            slack_monitor.print_all_channel_messages(channel_id)
+            return {"status": "success", "message": f"Printed all messages from channel {channel_id} to console"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
 
 @app.get("/test-webhook")
 async def test_webhook_manually():
