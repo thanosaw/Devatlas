@@ -9,52 +9,73 @@ import hmac
 import hashlib
 import asyncio
 import threading
-from typing import Optional
-from backend.routes import webhooks, slack
+from typing import Optional, List, Dict
+from backend.routes import webhooks
 from backend.config import settings
 from backend.services.github_service import process_push_event
-from backend.socket_mode import start_socket_mode
+from backend.slack_monitor import slack_monitor, start_monitor
 
 app = FastAPI()
 app.include_router(webhooks.router, prefix="/webhooks", tags=["webhooks"])
-app.include_router(slack.router, prefix="/slack", tags=["slack"])
 
-# Global variable to store the socket mode thread
-socket_mode_thread = None
+# Global variables to store background threads
+slack_monitor_thread = None
 
 @app.on_event("startup")
 async def startup_event():
     print("server started")
     print(f"Webhook route available at: /webhooks/github")
-    print(f"Slack routes available:")
-    print(f"  - /slack/track (POST)")
-    print(f"  - /slack/history/{{channel_id}} (GET)")
-    print(f"  - /slack/webhook (POST) - For Slack Events API")
     
-    # Start Socket Mode in a separate thread (if configured)
-    if settings.SLACK_APP_TOKEN and settings.SLACK_APP_TOKEN.startswith("xapp-"):
-        print(f"  - Starting Slack Socket Mode with app token")
-        global socket_mode_thread
-        socket_mode_thread = threading.Thread(
-            target=lambda: asyncio.run(start_socket_mode()),
+    # Start the Slack channel monitoring service
+    if settings.SLACK_BOT_TOKEN:
+        print(f"  - Starting Slack channel monitoring service")
+        
+        # Define channels to monitor - you can customize this list
+        # You can use channel names or IDs
+        channels_to_monitor = ["all-devatlas"]  # Replace with your channel names
+        
+        # Define polling interval in seconds
+        polling_interval = 30  # Check for new messages every 30 seconds
+        
+        global slack_monitor_thread
+        slack_monitor_thread = threading.Thread(
+            target=lambda: asyncio.run(start_monitor(channels_to_monitor, polling_interval)),
             daemon=True
         )
-        socket_mode_thread.start()
-        print(f"  ✅ Socket Mode started successfully")
+        slack_monitor_thread.start()
+        print(f"  ✅ Slack channel monitoring started for channels: {', '.join(channels_to_monitor)}")
     else:
-        print(f"  ⚠️ Socket Mode not started - missing or invalid SLACK_APP_TOKEN")
-    
-    print("\nTo set up the Slack Events API integration, run:")
-    print(f"  python setup_slack_events.py")
+        print(f"  ⚠️ Slack monitoring not started - missing SLACK_BOT_TOKEN")
 
 @app.on_event("shutdown")
 async def shutdown_event():
     print("Server shutting down")
-    # Socket Mode client will be automatically terminated as the thread is a daemon
+    # Background threads will be automatically terminated as they are daemon threads
 
 @app.get("/")
 async def root():
     return {"message": "Welcome to Ownership AI API"}
+
+@app.get("/slack/monitored-channels")
+async def get_monitored_channels():
+    """Get information about all channels being monitored"""
+    return slack_monitor.get_monitored_channels()
+
+@app.post("/slack/monitor/{channel}")
+async def add_channel_to_monitor(channel: str):
+    """Add a new channel to the monitoring service"""
+    result = await slack_monitor.add_channel(channel)
+    return result
+
+@app.get("/slack/monitor/history/{channel_id}")
+async def get_monitored_channel_history(channel_id: str, limit: int = 100):
+    """Get the cached message history for a monitored channel"""
+    messages = slack_monitor.get_channel_history(channel_id, limit)
+    return {
+        "channel_id": channel_id,
+        "message_count": len(messages),
+        "messages": messages
+    }
 
 @app.get("/test-webhook")
 async def test_webhook_manually():
