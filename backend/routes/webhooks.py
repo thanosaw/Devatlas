@@ -1,0 +1,56 @@
+# backend/routes/webhooks.py
+from fastapi import APIRouter, Request, Response, Header, HTTPException, Depends
+import hmac
+import hashlib
+import json
+import os
+from typing import Optional
+from backend.services.github_service import process_push_event
+from backend.config import settings
+
+router = APIRouter()
+
+async def verify_github_signature(request: Request, x_hub_signature_256: Optional[str] = Header(None)):
+    """Verify that the webhook request came from GitHub using the webhook secret."""
+    if not x_hub_signature_256:
+        raise HTTPException(status_code=401, detail="Missing signature header")
+    
+    # Get raw request body
+    payload_body = await request.body()
+    
+    # Create our own signature
+    secret = settings.GITHUB_WEBHOOK_SECRET.encode()
+    signature = 'sha256=' + hmac.new(secret, payload_body, hashlib.sha256).hexdigest()
+    
+    # Compare signatures
+    if not hmac.compare_digest(signature, x_hub_signature_256):
+        raise HTTPException(status_code=401, detail="Invalid signature")
+    
+    return payload_body
+
+@router.post("/github")
+async def github_webhook(request: Request, payload_body: bytes = Depends(verify_github_signature)):
+    """Endpoint to receive GitHub webhook events."""
+    
+    print("\n============ WEBHOOK RECEIVED ============")
+    print(f"Headers: {dict(request.headers)}")
+    
+    # Get the event type from headers
+    github_event = request.headers.get("X-GitHub-Event")
+    print(f"Event Type: {github_event}")
+    
+    if github_event == "push":
+        # Parse JSON payload
+        payload = json.loads(payload_body)
+        print(f"Repository: {payload.get('repository', {}).get('full_name', 'unknown')}")
+        print(f"Commits: {len(payload.get('commits', []))}")
+        
+        # Process the push event
+        await process_push_event(payload)
+        
+        print("✅ Push event successfully processed")
+        return {"status": "success", "message": "Push event processed"}
+    
+    # Return a 200 response for any other events we're not handling yet
+    print(f"⚠️ Ignoring event type: {github_event}")
+    return {"status": "ignored", "message": f"Event {github_event} ignored"}

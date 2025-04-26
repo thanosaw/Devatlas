@@ -1,4 +1,47 @@
+# API Framework
+fastapi==0.103.1
+uvicorn==0.23.2
+pydantic==2.4.2
+pydantic-settings==2.0.0
+python-dotenv>=1.0.0
+
+# Database
 sentence-transformers==2.2.2
 neo4j==5.24.0
-numpy
+langchain>=0.0.267  # Includes vector store utilities
 google-generativeai==0.3.1
+numpy
+
+
+# Vector Store
+chromadb>=0.4.18
+# Or if using Pinecone:
+# pinecone-client>=2.2.4
+
+# Embeddings
+# Alternative:
+# sentence-transformers>=2.2.2  # For open-source embeddings
+
+# Utils
+requests>=2.31.0
+python-multipart>=0.0.6  # For handling form data
+httpx>=0.24.1  # For async HTTP requests
+
+# Authentication
+firebase-admin>=6.2.0  # If using Firebase Auth
+# Or:
+# authlib>=1.2.1  # For OAuth2 implementation
+
+# Webhook handling
+PyJWT>=2.8.0  # For token verification
+
+# Logging
+loguru>=0.7.2  # Better logging than the standard library
+
+# Testing
+pytest>=7.4.2
+pytest-asyncio>=0.21.1
+
+# Slack Integration
+slack-sdk>=3.26.1  # For Slack API integration
+pyngrok>=7.0.0  # For exposing local server to the internet
