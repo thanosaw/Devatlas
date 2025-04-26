@@ -5,7 +5,7 @@ import hashlib
 import json
 import os
 from typing import Optional
-from backend.services.github_service import process_push_event
+from backend.services.github_service import process_push_event, process_pull_request_event
 from backend.config import settings
 
 router = APIRouter()
@@ -39,9 +39,11 @@ async def github_webhook(request: Request, payload_body: bytes = Depends(verify_
     github_event = request.headers.get("X-GitHub-Event")
     print(f"Event Type: {github_event}")
     
+    # Parse JSON payload
+    payload = json.loads(payload_body)
+    
+    # Handle different event types
     if github_event == "push":
-        # Parse JSON payload
-        payload = json.loads(payload_body)
         print(f"Repository: {payload.get('repository', {}).get('full_name', 'unknown')}")
         print(f"Commits: {len(payload.get('commits', []))}")
         
@@ -50,6 +52,17 @@ async def github_webhook(request: Request, payload_body: bytes = Depends(verify_
         
         print("✅ Push event successfully processed")
         return {"status": "success", "message": "Push event processed"}
+        
+    elif github_event == "pull_request":
+        print(f"Repository: {payload.get('repository', {}).get('full_name', 'unknown')}")
+        print(f"PR Number: {payload.get('number', 'unknown')}")
+        print(f"Action: {payload.get('action', 'unknown')}")
+        
+        # Process the pull request event
+        await process_pull_request_event(payload)
+        
+        print("✅ Pull request event successfully processed")
+        return {"status": "success", "message": "Pull request event processed"}
     
     # Return a 200 response for any other events we're not handling yet
     print(f"⚠️ Ignoring event type: {github_event}")

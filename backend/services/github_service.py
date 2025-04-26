@@ -84,3 +84,77 @@ async def process_push_event(payload):
     except Exception as e:
         logger.error(f"Error processing push event: {str(e)}")
         raise
+
+async def process_pull_request_event(payload):
+    """Process a GitHub pull request event."""
+    try:
+        # Extract relevant information from the payload
+        action = payload["action"]  # opened, closed, reopened, etc.
+        pr_number = payload["number"]
+        pr_title = payload["pull_request"]["title"]
+        pr_body = payload["pull_request"]["body"] or ""
+        pr_url = payload["pull_request"]["html_url"]
+        
+        repo_name = payload["repository"]["full_name"]
+        user = payload["pull_request"]["user"]["login"]
+        
+        # Get source and target branch information
+        head_branch = payload["pull_request"]["head"]["ref"]
+        base_branch = payload["pull_request"]["base"]["ref"]
+        
+        is_merged = payload["pull_request"].get("merged", False)
+        
+        # Print header
+        print(f"\n==== Pull Request Event: {repo_name} ====")
+        print(f"Action: {action.upper()}")
+        print(f"PR #{pr_number}: {pr_title}")
+        print(f"User: {user}")
+        print(f"URL: {pr_url}")
+        print("-" * 50)
+        
+        # Print PR details
+        print(f"Source: {head_branch} → Target: {base_branch}")
+        
+        # Handle different PR actions
+        if action == "opened" or action == "reopened":
+            print(f"Status: {action.upper()}")
+            print(f"\nDescription:")
+            
+            # Format PR body with indentation
+            newline = "\n"
+            if pr_body:
+                indented_body = pr_body.strip().replace(newline, f"{newline}    ")
+                print(f"    {indented_body}")
+            else:
+                print("    No description provided.")
+                
+        elif action == "closed":
+            if is_merged:
+                print("Status: MERGED")
+                merged_by = payload["pull_request"]["merged_by"]["login"]
+                print(f"Merged by: {merged_by}")
+            else:
+                print("Status: CLOSED (not merged)")
+                
+        elif action == "synchronize":
+            print("Status: UPDATED (new commits pushed)")
+            
+        elif action == "review_requested":
+            reviewers = payload["pull_request"]["requested_reviewers"]
+            reviewer_names = [reviewer["login"] for reviewer in reviewers]
+            print(f"Review requested from: {', '.join(reviewer_names)}")
+            
+        # If the PR was merged, get the changed files
+        if action == "closed" and is_merged:
+            # In a real implementation, you'd need to make additional API calls
+            # to get the full list of changed files in the PR
+            print("\nThis PR modified files (showing few examples):")
+            print("    * Add file list API call in production version")
+            
+        print("-" * 50)
+            
+        logger.info(f"Processed pull request event for {repo_name}, PR #{pr_number}, action: {action}")
+        
+    except Exception as e:
+        logger.error(f"Error processing pull request event: {str(e)}")
+        raise
