@@ -10,6 +10,7 @@ import os
 import time
 import logging
 import asyncio
+import json
 from datetime import datetime
 from typing import Dict, List, Optional, Set
 from dotenv import load_dotenv
@@ -25,6 +26,13 @@ logger = logging.getLogger(__name__)
 
 # Load environment variables
 load_dotenv()
+
+# JSON storage location
+DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
+SLACK_MESSAGES_FILE = os.path.join(DATA_DIR, "slack_messages.json")
+
+# Ensure data directory exists
+os.makedirs(DATA_DIR, exist_ok=True)
 
 class SlackMonitor:
     """Service for continuously monitoring Slack channels"""
@@ -42,6 +50,68 @@ class SlackMonitor:
         self.threads_seen = set()     # Set of parent_ts values we've processed
         self.running = False
         
+        # Initialize message storage file if it doesn't exist
+        self._initialize_message_file()
+        
+    def _initialize_message_file(self):
+        """Initialize the JSON file for storing messages if it doesn't exist"""
+        if not os.path.exists(SLACK_MESSAGES_FILE):
+            with open(SLACK_MESSAGES_FILE, 'w') as f:
+                json.dump({
+                    "channels": {},
+                    "last_updated": datetime.now().isoformat(),
+                    "message_count": 0
+                }, f, indent=2)
+            logger.info(f"Created message storage file: {SLACK_MESSAGES_FILE}")
+        else:
+            logger.info(f"Using existing message storage file: {SLACK_MESSAGES_FILE}")
+    
+    def _load_messages_from_file(self):
+        """Load messages from the JSON file"""
+        try:
+            with open(SLACK_MESSAGES_FILE, 'r') as f:
+                return json.load(f)
+        except (json.JSONDecodeError, FileNotFoundError) as e:
+            logger.error(f"Error loading messages from file: {str(e)}")
+            return {
+                "channels": {},
+                "last_updated": datetime.now().isoformat(),
+                "message_count": 0
+            }
+    
+    def _save_messages_to_file(self, data):
+        """Save messages to the JSON file"""
+        try:
+            with open(SLACK_MESSAGES_FILE, 'w') as f:
+                json.dump(data, indent=2, fp=f)
+            logger.info(f"Updated message storage file with new messages")
+        except Exception as e:
+            logger.error(f"Error saving messages to file: {str(e)}")
+    
+    def _add_messages_to_storage(self, channel_id, new_messages):
+        """Add new messages to the JSON storage file"""
+        # Load current data
+        data = self._load_messages_from_file()
+        
+        # Initialize channel if needed
+        if channel_id not in data["channels"]:
+            channel_name = self.monitored_channels[channel_id]['name']
+            data["channels"][channel_id] = {
+                "name": channel_name,
+                "messages": []
+            }
+        
+        # Add new messages
+        for msg in new_messages:
+            data["channels"][channel_id]["messages"].insert(0, msg)  # Insert at beginning to maintain reverse chronological order
+        
+        # Update metadata
+        data["last_updated"] = datetime.now().isoformat()
+        data["message_count"] = sum(len(channel_data["messages"]) for channel_data in data["channels"].values())
+        
+        # Save updated data
+        self._save_messages_to_file(data)
+    
     async def add_channel(self, channel_name_or_id: str) -> Dict:
         """
         Start monitoring a channel by name or ID
@@ -86,19 +156,12 @@ class SlackMonitor:
                 # Cache these messages
                 self.message_cache[channel_id] = messages
                 
+                # Add messages to JSON storage
+                self._add_messages_to_storage(channel_id, messages)
+                
                 # Log info about channel
                 channel_name = channel_info.get('name')
                 logger.info(f"Added channel #{channel_name} ({channel_id}) with {len(messages)} initial messages")
-                
-                # Print past messages
-                print(f"\n===== PAST MESSAGES FROM CHANNEL #{channel_name} =====")
-                for msg in messages:
-                    user = msg.get('user', 'Unknown')
-                    text = msg.get('text', 'No text')
-                    ts = msg.get('ts', 'Unknown time')
-                    print(f"[{ts}] User: {user}")
-                    print(f"Message: {text}")
-                    print("-" * 50)
                 
                 # Process any existing threads
                 await self._process_threads(channel_id, messages)
@@ -189,18 +252,11 @@ class SlackMonitor:
                         channel_name = self.monitored_channels[channel_id]['name']
                         logger.info(f"Found {len(new_messages)} new messages in #{channel_name}")
                         
-                        # Print each message content
-                        print(f"\n===== NEW MESSAGES IN CHANNEL #{channel_name} =====")
-                        for msg in new_messages:
-                            user = msg.get('user', 'Unknown')
-                            text = msg.get('text', 'No text')
-                            ts = msg.get('ts', 'Unknown time')
-                            print(f"[{ts}] User: {user}")
-                            print(f"Message: {text}")
-                            print("-" * 50)
-                        
                         # Add to our message cache (prepend to keep chronological order)
                         self.message_cache[channel_id] = new_messages + self.message_cache[channel_id]
+                        
+                        # Add new messages to JSON storage
+                        self._add_messages_to_storage(channel_id, new_messages)
                         
                         # Process any threads in the new messages
                         await self._process_threads(channel_id, new_messages)
@@ -292,42 +348,51 @@ class SlackMonitor:
         
     def print_all_channel_messages(self, channel_id: str = None) -> None:
         """
-        Print all cached messages for a channel or all channels
+        Print all cached messages for a channel or all channels to JSON file
+        instead of console output.
         
         Args:
             channel_id: Optional specific channel ID to print, or None for all channels
         """
+        # Instead of printing, ensure all messages are saved to the JSON file
         if channel_id:
-            # Print messages for specific channel
+            # Update JSON for specific channel
             if channel_id in self.message_cache:
                 channel_name = self.monitored_channels[channel_id]['name']
                 messages = self.message_cache[channel_id]
                 
-                print(f"\n===== ALL MESSAGES FROM CHANNEL #{channel_name} ({len(messages)} messages) =====")
-                for msg in messages:
-                    user = msg.get('user', 'Unknown')
-                    text = msg.get('text', 'No text')
-                    ts = msg.get('ts', 'Unknown time')
-                    print(f"[{ts}] User: {user}")
-                    print(f"Message: {text}")
-                    print("-" * 50)
+                logger.info(f"Saving {len(messages)} messages from channel #{channel_name} to JSON file")
+                
+                # Add to JSON storage
+                self._add_messages_to_storage(channel_id, messages)
+                
+                # Log location of the data file
+                logger.info(f"Messages saved to: {SLACK_MESSAGES_FILE}")
             else:
-                print(f"No messages found for channel {channel_id}")
+                logger.warning(f"No messages found for channel {channel_id}")
         else:
-            # Print messages for all channels
+            # Update JSON for all channels
             for cid, info in self.monitored_channels.items():
                 if cid in self.message_cache:
                     channel_name = info['name']
                     messages = self.message_cache[cid]
                     
-                    print(f"\n===== ALL MESSAGES FROM CHANNEL #{channel_name} ({len(messages)} messages) =====")
-                    for msg in messages:
-                        user = msg.get('user', 'Unknown')
-                        text = msg.get('text', 'No text')
-                        ts = msg.get('ts', 'Unknown time')
-                        print(f"[{ts}] User: {user}")
-                        print(f"Message: {text}")
-                        print("-" * 50)
+                    logger.info(f"Saving {len(messages)} messages from channel #{channel_name} to JSON file")
+                    
+                    # Add to JSON storage
+                    self._add_messages_to_storage(cid, messages)
+            
+            # Log location of the data file
+            logger.info(f"All messages saved to: {SLACK_MESSAGES_FILE}")
+
+    def get_json_message_data(self) -> Dict:
+        """
+        Get all messages from the JSON storage file
+        
+        Returns:
+            Dict containing all messages and metadata
+        """
+        return self._load_messages_from_file()
 
 # Create a singleton instance
 slack_monitor = SlackMonitor()

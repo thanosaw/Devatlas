@@ -79,16 +79,40 @@ async def get_monitored_channel_history(channel_id: str, limit: int = 100):
 
 @app.get("/slack/print-messages/{channel_id}")
 async def print_channel_messages(channel_id: str = None):
-    """Print all messages for a channel to the console"""
+    """
+    Save all messages for a channel to the JSON file.
+    This endpoint was previously used to print messages to console but now writes to a JSON file.
+    """
     try:
         if channel_id == "all":
-            # Print messages for all channels
+            # Save messages for all channels
             slack_monitor.print_all_channel_messages()
-            return {"status": "success", "message": "Printed all messages from all channels to console"}
+            return {"status": "success", "message": "Saved all messages from all channels to JSON file"}
         else:
-            # Print messages for specific channel
+            # Save messages for specific channel
             slack_monitor.print_all_channel_messages(channel_id)
-            return {"status": "success", "message": f"Printed all messages from channel {channel_id} to console"}
+            return {"status": "success", "message": f"Saved all messages from channel {channel_id} to JSON file"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+@app.get("/slack/messages-json")
+async def get_slack_messages_json():
+    """
+    Get all Slack messages from the JSON storage file.
+    This endpoint is useful for integration with Neo4j and other services.
+    """
+    try:
+        # Get the data using the new method
+        message_data = slack_monitor.get_json_message_data()
+        
+        # Get the file path from the module, not the instance
+        from backend.slack_monitor import SLACK_MESSAGES_FILE
+        
+        return {
+            "status": "success",
+            "data": message_data,
+            "file_path": SLACK_MESSAGES_FILE
+        }
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
