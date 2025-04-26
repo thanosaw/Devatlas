@@ -11,6 +11,7 @@ import time
 import logging
 import asyncio
 import json
+import re
 from datetime import datetime
 from typing import Dict, List, Optional, Set
 from dotenv import load_dotenv
@@ -49,6 +50,7 @@ class SlackMonitor:
         self.message_cache = {}       # channel_id -> list of messages
         self.threads_seen = set()     # Set of parent_ts values we've processed
         self.running = False
+        self.user_cache = {}          # user_id -> user_info
         
         # Initialize message storage file if it doesn't exist
         self._initialize_message_file()
@@ -101,9 +103,11 @@ class SlackMonitor:
                 "messages": []
             }
         
-        # Add new messages
+        # Process and add new messages
         for msg in new_messages:
-            data["channels"][channel_id]["messages"].insert(0, msg)  # Insert at beginning to maintain reverse chronological order
+            # Process user IDs in the message
+            processed_msg = self._process_message_users(msg)
+            data["channels"][channel_id]["messages"].insert(0, processed_msg)  # Insert at beginning to maintain reverse chronological order
         
         # Update metadata
         data["last_updated"] = datetime.now().isoformat()
@@ -393,6 +397,148 @@ class SlackMonitor:
             Dict containing all messages and metadata
         """
         return self._load_messages_from_file()
+        
+    def update_existing_messages_with_user_info(self):
+        """
+        Update all existing messages in the JSON file with user information
+        
+        Returns:
+            Dict with update status
+        """
+        try:
+            logger.info("Starting update of existing messages with user info")
+            data = self._load_messages_from_file()
+            
+            total_messages = data["message_count"]
+            processed_count = 0
+            
+            # Process each channel
+            for channel_id, channel_data in data["channels"].items():
+                channel_name = channel_data.get("name", "unknown")
+                logger.info(f"Processing {len(channel_data['messages'])} messages in channel {channel_name}")
+                
+                # Process each message in the channel
+                for i, message in enumerate(channel_data["messages"]):
+                    # Process user IDs in the message
+                    processed_msg = self._process_message_users(message)
+                    # Replace the original message with the processed one
+                    channel_data["messages"][i] = processed_msg
+                    processed_count += 1
+                    
+                    # Log progress periodically
+                    if processed_count % 100 == 0:
+                        logger.info(f"Processed {processed_count}/{total_messages} messages")
+            
+            # Update metadata
+            data["last_updated"] = datetime.now().isoformat()
+            
+            # Save updated data
+            self._save_messages_to_file(data)
+            
+            logger.info(f"Completed update of {processed_count} messages with user info")
+            return {
+                "status": "success",
+                "processed_count": processed_count,
+                "total_messages": total_messages
+            }
+            
+        except Exception as e:
+            logger.error(f"Error updating messages with user info: {str(e)}")
+            return {
+                "status": "error",
+                "error": str(e)
+            }
+
+    def _get_user_info(self, user_id):
+        """
+        Get user information for a given user ID
+        
+        Args:
+            user_id: The Slack user ID
+            
+        Returns:
+            Dict containing user info
+        """
+        if not user_id:
+            return {"id": "unknown", "name": "Unknown", "real_name": "Unknown User"}
+            
+        # Return cached user info if available
+        if user_id in self.user_cache:
+            return self.user_cache[user_id]
+            
+        try:
+            # Fetch user info from Slack API
+            result = self.client.users_info(user=user_id)
+            user = result["user"]
+            
+            # Create user info dict
+            user_info = {
+                "id": user["id"],
+                "name": user["name"],
+                "real_name": user.get("real_name", user["name"]),
+                "display_name": user["profile"].get("display_name", user["name"]),
+                "image_url": user["profile"].get("image_72", "")
+            }
+            
+            # Cache user info
+            self.user_cache[user_id] = user_info
+            return user_info
+            
+        except SlackApiError as e:
+            logger.error(f"Error fetching user info for {user_id}: {e.response['error']}")
+            return {"id": user_id, "name": "unknown", "real_name": "Unknown User"}
+            
+    def _process_message_users(self, message):
+        """
+        Process a message to replace user IDs with user info
+        
+        Args:
+            message: The message to process
+            
+        Returns:
+            Processed message with user info
+        """
+        # Make a copy of the message to avoid modifying the original
+        processed_msg = message.copy()
+        
+        # Process the main message user
+        if "user" in processed_msg and processed_msg["user"]:
+            user_id = processed_msg["user"]
+            user_info = self._get_user_info(user_id)
+            # Store user ID and set user field to username for easier display
+            processed_msg["user_id"] = user_id
+            processed_msg["user"] = user_info["name"]
+            processed_msg["user_info"] = user_info
+        
+        # Process reply users if present
+        if "reply_users" in processed_msg and processed_msg["reply_users"]:
+            # Store original IDs for reference
+            processed_msg["reply_users_ids"] = processed_msg["reply_users"].copy()
+            
+            # Set reply_users to usernames
+            reply_users_info = []
+            reply_usernames = []
+            for reply_user_id in processed_msg["reply_users"]:
+                user_info = self._get_user_info(reply_user_id)
+                reply_users_info.append(user_info)
+                reply_usernames.append(user_info["name"])
+            
+            processed_msg["reply_users_info"] = reply_users_info
+            processed_msg["reply_users"] = reply_usernames
+            
+        # Process message mentions in text
+        if "text" in processed_msg and processed_msg["text"]:
+            # Find user mentions in format <@USER_ID>
+            mentions = re.findall(r'<@(U[A-Z0-9]+)>', processed_msg["text"])
+            for mention_id in mentions:
+                user_info = self._get_user_info(mention_id)
+                # Replace mention with username
+                processed_msg["text"] = processed_msg["text"].replace(
+                    f"<@{mention_id}>", 
+                    f"@{user_info['name']}"
+                )
+                
+        return processed_msg
 
 # Create a singleton instance
 slack_monitor = SlackMonitor()

@@ -116,6 +116,22 @@ async def get_slack_messages_json():
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
+@app.get("/slack/update-user-info")
+async def update_messages_with_user_info():
+    """
+    Update all existing messages in the JSON file with user information.
+    This converts user IDs to readable usernames and adds profile info.
+    """
+    try:
+        result = slack_monitor.update_existing_messages_with_user_info()
+        return {
+            "status": result["status"],
+            "message": f"Updated {result.get('processed_count', 0)} messages with user info",
+            "details": result
+        }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
 @app.get("/test-webhook")
 async def test_webhook_manually():
     """
