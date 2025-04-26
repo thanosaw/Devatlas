@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+/backend/venv
+.env
+=======
 # Python
 __pycache__/
 *.py[cod]
@@ -54,3 +58,4 @@ yarn-error.log
 
 # Data
 data/
+>>>>>>> origin/main
