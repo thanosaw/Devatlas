@@ -7,18 +7,50 @@ from fastapi import FastAPI, Request, Response, Header, Depends
 import json
 import hmac
 import hashlib
+import asyncio
+import threading
 from typing import Optional
-from backend.routes import webhooks
+from backend.routes import webhooks, slack
 from backend.config import settings
 from backend.services.github_service import process_push_event
+from backend.socket_mode import start_socket_mode
 
 app = FastAPI()
 app.include_router(webhooks.router, prefix="/webhooks", tags=["webhooks"])
+app.include_router(slack.router, prefix="/slack", tags=["slack"])
+
+# Global variable to store the socket mode thread
+socket_mode_thread = None
 
 @app.on_event("startup")
 async def startup_event():
     print("server started")
     print(f"Webhook route available at: /webhooks/github")
+    print(f"Slack routes available:")
+    print(f"  - /slack/track (POST)")
+    print(f"  - /slack/history/{{channel_id}} (GET)")
+    print(f"  - /slack/webhook (POST) - For Slack Events API")
+    
+    # Start Socket Mode in a separate thread (if configured)
+    if settings.SLACK_APP_TOKEN and settings.SLACK_APP_TOKEN.startswith("xapp-"):
+        print(f"  - Starting Slack Socket Mode with app token")
+        global socket_mode_thread
+        socket_mode_thread = threading.Thread(
+            target=lambda: asyncio.run(start_socket_mode()),
+            daemon=True
+        )
+        socket_mode_thread.start()
+        print(f"  ✅ Socket Mode started successfully")
+    else:
+        print(f"  ⚠️ Socket Mode not started - missing or invalid SLACK_APP_TOKEN")
+    
+    print("\nTo set up the Slack Events API integration, run:")
+    print(f"  python setup_slack_events.py")
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    print("Server shutting down")
+    # Socket Mode client will be automatically terminated as the thread is a daemon
 
 @app.get("/")
 async def root():
