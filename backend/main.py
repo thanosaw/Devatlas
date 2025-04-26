@@ -116,6 +116,61 @@ async def get_slack_messages_json():
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
+@app.get("/slack/entities")
+async def get_slack_entities():
+    """
+    Get all Slack data in the new entity format (channels and messages).
+    This endpoint returns data in the more normalized format with Channel and Message entities.
+    """
+    try:
+        # Get the entity data
+        entity_data = slack_monitor.get_entity_message_data()
+        
+        # Get the file path from the module
+        from backend.slack_monitor import SLACK_ENTITIES_FILE
+        
+        return {
+            "status": "success",
+            "data": entity_data,
+            "file_path": SLACK_ENTITIES_FILE
+        }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+@app.post("/slack/convert-to-entities")
+async def convert_to_entity_format():
+    """
+    Convert all existing Slack data to the new entity format.
+    This endpoint takes the current message data and transforms it into the normalized Channel and Message entities.
+    """
+    try:
+        # Convert the data
+        result = slack_monitor.convert_to_entity_format()
+        
+        return {
+            "status": "success",
+            "message": f"Successfully converted data to entity format",
+            "details": result
+        }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+@app.get("/slack/update-user-info")
+async def update_messages_with_user_info():
+    """
+    Update all existing messages in the JSON file with user information.
+    This converts user IDs to readable usernames and adds profile info.
+    """
+    try:
+        result = slack_monitor.update_existing_messages_with_user_info()
+        return {
+            "status": result["status"],
+            "message": f"Updated {result.get('processed_count', 0)} messages with user info",
+            "details": result
+        }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
 @app.get("/test-webhook")
 async def test_webhook_manually():
     """
@@ -181,3 +236,54 @@ async def test_webhook_manually():
     except Exception as e:
         print(f"❌ Error testing webhook: {str(e)}")
         return {"status": "error", "message": f"Error: {str(e)}"}
+
+@app.get("/slack/thread/{channel_id}/{thread_ts}")
+async def get_thread_replies(channel_id: str, thread_ts: str):
+    """
+    Get all replies in a specific thread.
+    
+    Args:
+        channel_id: The channel ID
+        thread_ts: The timestamp of the parent message
+        
+    Returns:
+        Thread replies and parent message
+    """
+    try:
+        # Call the Slack API directly to get fresh thread data
+        thread_replies = slack_monitor.client.conversations_replies(
+            channel=channel_id,
+            ts=thread_ts,
+            limit=100  # Get all replies
+        )
+        
+        messages = thread_replies.get("messages", [])
+        
+        # Process messages to add user info and convert timestamps
+        processed_messages = []
+        for msg in messages:
+            processed_msg = slack_monitor._process_message_users(msg)
+            
+            # Convert timestamps to human-readable format
+            if "ts" in processed_msg:
+                processed_msg["iso_ts"] = slack_monitor._convert_slack_ts_to_iso(processed_msg["ts"])
+            if "thread_ts" in processed_msg:
+                processed_msg["iso_thread_ts"] = slack_monitor._convert_slack_ts_to_iso(processed_msg["thread_ts"])
+                
+            processed_messages.append(processed_msg)
+        
+        # Extract parent message and replies
+        parent_message = processed_messages[0] if processed_messages else None
+        replies = processed_messages[1:] if len(processed_messages) > 1 else []
+        
+        return {
+            "status": "success",
+            "channel_id": channel_id,
+            "thread_ts": thread_ts,
+            "iso_thread_ts": slack_monitor._convert_slack_ts_to_iso(thread_ts),
+            "parent_message": parent_message,
+            "replies": replies,
+            "reply_count": len(replies)
+        }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
