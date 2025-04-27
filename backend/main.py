@@ -11,6 +11,7 @@ from typing import Optional
 from backend.routes import webhooks
 from backend.config import settings
 from backend.services.github_service import process_push_event, process_pull_request_event
+from backend.services.github_processor import GitHubProcessor
 
 app = FastAPI()
 app.include_router(webhooks.router, prefix="/webhooks", tags=["webhooks"])
@@ -19,6 +20,17 @@ app.include_router(webhooks.router, prefix="/webhooks", tags=["webhooks"])
 async def startup_event():
     print("server started")
     print(f"Webhook route available at: /webhooks/github")
+    print(f"Processed GitHub webhooks will be saved to: {GitHubProcessor.ACTIONS_FILE}")
+    print("Supported webhook events:")
+    print("  - push (including merges)")
+    print("  - pull_request")
+    print("  - pull_request_review")
+    print("  - pull_request_review_comment")
+    print("  - issues")
+    print("  - issue_comment")
+    print("  - discussion")
+    print("  - discussion_comment")
+    print("  - label")
 
 @app.get("/")
 async def root():
