@@ -27,7 +27,7 @@ NODE_TYPE_LABELS = {
 
 # Configure argument parser
 parser = argparse.ArgumentParser(description='Import data into Neo4j graph database')
-parser.add_argument('--input', type=str, default='mock_with_embeddings.json', 
+parser.add_argument('--input', type=str, default='backend/processTools/mock_with_embeddings.json', 
                     help='Input JSON file with embeddings')
 parser.add_argument('--neo4j-uri', type=str, default='neo4j://localhost:7687', 
                     help='Neo4j connection URI')

@@ -6,9 +6,10 @@ import json
 import os
 from typing import Dict, Any, List
 from embedding_service import EmbeddingService
+from update_mock_data import update_mock_with_slack_data
 
-INPUT_FILE = "mock.json"
-OUTPUT_FILE = "mock_with_embeddings.json"
+INPUT_FILE = "backend/processTools/mock.json"
+OUTPUT_FILE = "backend/processTools/mock_with_embeddings.json"
 
 NODE_TYPE_MAPPING = {
     "users": "User",
@@ -58,6 +59,13 @@ def process_all_nodes(data: Dict[str, Any], embedding_service: EmbeddingService)
     return result
 
 def main():
+    # First update mock.json with Slack data
+    print("Updating mock.json with Slack data...")
+    update_result = update_mock_with_slack_data()
+    if not update_result:
+        print("Failed to update mock.json with Slack data")
+        return
+    
     if not os.path.exists(INPUT_FILE):
         print(f"Error: Input file {INPUT_FILE} not found")
         return
