@@ -4,6 +4,8 @@ Script to process all nodes in the mock data and add embeddings to them.
 
 import json
 import os
+import requests
+import sys
 from typing import Dict, Any, List
 from embedding_service import EmbeddingService
 from update_mock_data import update_mock_with_slack_data, update_mock_with_github_data
@@ -61,7 +63,25 @@ def process_all_nodes(data: Dict[str, Any], embedding_service: EmbeddingService)
     return result
 
 def main():
-    # First update mock.json with Slack data
+    # First fetch the latest GitHub data from the API
+    print("Fetching latest GitHub data from API...")
+    try:
+        response = requests.get("http://127.0.0.1:8000/fetch-github-data/MichaelPeng123/lahacks2025")
+        if response.status_code == 200:
+            print(f"Successfully fetched GitHub data: {response.json().get('message', '')}")
+        else:
+            print(f"Failed to fetch GitHub data: {response.status_code}")
+            print("Stopping execution - cannot proceed without fresh GitHub data")
+            sys.exit(1)  # Exit with error code
+    except Exception as e:
+        print(f"Error calling GitHub data endpoint: {str(e)}")
+        print("Stopping execution - cannot proceed without fresh GitHub data")
+        sys.exit(1)  # Exit with error code
+    
+    # Only continue here if GitHub data was successfully fetched
+    print("GitHub data successfully fetched, continuing with process...")
+    
+    # Update mock.json with Slack data
     print("Updating mock.json with Slack data...")
     update_result = update_mock_with_slack_data()
     if not update_result:
