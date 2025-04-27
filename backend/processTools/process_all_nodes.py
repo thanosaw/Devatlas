@@ -4,11 +4,23 @@ Script to process all nodes in the mock data and add embeddings to them.
 
 import json
 import os
+import requests
+import sys
 from typing import Dict, Any, List
 from embedding_service import EmbeddingService
+from update_mock_data import update_mock_with_slack_data, update_mock_with_github_data
 
-INPUT_FILE = "mock.json"
-OUTPUT_FILE = "mock_with_embeddings.json"
+from backend.services.github_fetch import (
+    fetch_and_save_all_pull_requests, 
+    fetch_and_save_all_issues, 
+    fetch_and_save_all_pr_and_issues,
+    fetch_and_save_all_github_data
+)
+
+# Using more flexible path resolution
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+INPUT_FILE = os.path.join(CURRENT_DIR, "mock.json")
+OUTPUT_FILE = os.path.join(CURRENT_DIR, "mock_with_embeddings.json")
 
 NODE_TYPE_MAPPING = {
     "users": "User",
@@ -58,6 +70,32 @@ def process_all_nodes(data: Dict[str, Any], embedding_service: EmbeddingService)
     return result
 
 def main():
+    # First fetch the latest GitHub data from the API
+    
+    # Only continue here if GitHub data was successfully fetched
+
+    fetch_and_save_all_github_data("MichaelPeng123", "lahacks2025")
+    
+    print("GitHub data successfully fetched, continuing with process...")
+    
+    # Update mock.json with Slack data
+    print("Updating mock.json with Slack data...")
+    update_result = update_mock_with_slack_data()
+    if not update_result:
+        print("Failed to update mock.json with Slack data")
+        
+        # Create an empty mock file if needed
+        if not os.path.exists(INPUT_FILE):
+            print(f"Creating empty mock file at {INPUT_FILE}")
+            empty_data = {"users":[],"repositories":[],"pullRequests":[],"issues":[],"slackChannels":[],"slackMessages":[],"textChunks":[]}
+            with open(INPUT_FILE, 'w') as f:
+                json.dump(empty_data, f, indent=2)
+    
+    update_result = update_mock_with_github_data()
+    if not update_result:
+        print("Failed to update mock.json with github data")
+        return
+
     if not os.path.exists(INPUT_FILE):
         print(f"Error: Input file {INPUT_FILE} not found")
         return
@@ -67,6 +105,9 @@ def main():
     embedding_service = EmbeddingService()
     
     processed_data = process_all_nodes(data, embedding_service)
+    
+    # Ensure the directory exists
+    os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
     
     save_data(processed_data, OUTPUT_FILE)
     

@@ -3,6 +3,39 @@
 # app = FastAPI()
 # app.include_router(webhooks.router, prefix="/webhooks", tags=["webhooks"])
 
+from fastapi import FastAPI, Request, Depends, HTTPException, Query
+import logging
+import uvicorn
+from backend.routes.webhooks import router as webhooks_router
+from backend.services.github_processor import GitHubProcessor
+from fastapi.middleware.cors import CORSMiddleware
+import os
+from typing import List, Dict, Any, Optional
+from dotenv import load_dotenv
+
+# Import the GitHub fetcher
+from backend.services.github_fetch import (
+    fetch_and_save_all_pull_requests, 
+    fetch_and_save_all_issues, 
+    fetch_and_save_all_pr_and_issues,
+    fetch_and_save_all_github_data
+)
+
+# Import processing tools
+# from backend.processTools.process_all_nodes import main as process_all_nodes
+# from backend.processTools.import_to_neo4j import main as import_to_neo4j
+
+# Load environment variables
+load_dotenv()
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+app = FastAPI(title="LA Hacks 2025 Webhook Handler")
 from fastapi import FastAPI, Request, Response, Header, Depends
 import json
 import hmac
@@ -23,19 +56,124 @@ app = FastAPI()
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Frontend dev server
+    allow_origins=["*"],  # Allows all origins
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
 )
-
-app.include_router(webhooks.router, prefix="/webhooks", tags=["webhooks"])
 
 # Global variables to store background threads
 slack_monitor_thread = None
 
+# Add these functions to handle the script execution with proper import paths
+def ensure_process_directories():
+    """Ensure all necessary directories and files exist for processing"""
+    import os
+    
+    # Create directories if they don't exist
+    os.makedirs('backend/processTools', exist_ok=True)
+    os.makedirs('processTools', exist_ok=True)
+    
+    # Define file paths that need to exist
+    required_files = {
+        'backend/processTools/mock.json': 'processTools/mock.json',
+        'processTools/mock.json': None,  # Create empty if doesn't exist
+    }
+    
+    # Create or symlink files
+    for target_path, source_path in required_files.items():
+        if not os.path.exists(target_path):
+            if source_path and os.path.exists(source_path):
+                # Create symlink
+                print(f"Creating symlink from {source_path} to {target_path}")
+                os.symlink(os.path.abspath(source_path), target_path)
+            else:
+                # Create empty file
+                print(f"Creating empty file at {target_path}")
+                with open(target_path, 'w') as f:
+                    f.write('{"users":[],"repositories":[],"pullRequests":[],"issues":[],"slackChannels":[],"slackMessages":[],"textChunks":[]}')
+
+def run_process_all_nodes():
+    """Run the process_all_nodes.py script with proper import handling"""
+    import sys
+    import os
+    
+    # Ensure directories and files exist
+    ensure_process_directories()
+    
+    # Add the processTools directory to the Python path
+    process_tools_dir = os.path.join(os.path.dirname(__file__), 'processTools')
+    if process_tools_dir not in sys.path:
+        sys.path.append(process_tools_dir)
+    
+    # Create mock.json if it doesn't exist
+    mock_json_path = os.path.join(process_tools_dir, 'mock.json')
+    if not os.path.exists(mock_json_path):
+        print(f"Creating empty mock.json file at {mock_json_path}")
+        with open(mock_json_path, 'w') as f:
+            f.write('{"users":[],"repositories":[],"pullRequests":[],"issues":[],"slackChannels":[],"slackMessages":[],"textChunks":[]}')
+    
+    # Save original argv
+    original_argv = sys.argv.copy()
+    
+    try:
+        # Set clean argv for the script
+        sys.argv = [sys.argv[0]]  # Keep just the script name
+        print("Running process_all_nodes.py")
+        
+        # Now import and run the main function
+        from process_all_nodes import main
+        return main()
+    finally:
+        # Restore original argv
+        sys.argv = original_argv
+
+def run_import_to_neo4j():
+    """Run the import_to_neo4j.py script with proper import handling"""
+    import sys
+    import os
+    
+    # Add the processTools directory to the Python path
+    process_tools_dir = os.path.join(os.path.dirname(__file__), 'processTools')
+    if process_tools_dir not in sys.path:
+        sys.path.append(process_tools_dir)
+    
+    # Check for mock_with_embeddings.json
+    mock_with_embeddings_path = os.path.join(process_tools_dir, 'mock_with_embeddings.json')
+    if not os.path.exists(mock_with_embeddings_path):
+        print(f"Warning: {mock_with_embeddings_path} not found. Creating a copy from mock.json")
+        mock_json_path = os.path.join(process_tools_dir, 'mock.json')
+        if os.path.exists(mock_json_path):
+            import shutil
+            shutil.copy2(mock_json_path, mock_with_embeddings_path)
+        else:
+            print(f"Error: mock.json not found either, cannot create mock_with_embeddings.json")
+    
+    # Save original argv
+    original_argv = sys.argv.copy()
+    
+    try:
+        # Set clean argv for the script
+        sys.argv = [sys.argv[0]]  # Keep just the script name
+        
+        # Specify input file explicitly
+        print(f"Running import_to_neo4j.py with input file {mock_with_embeddings_path}")
+        sys.argv.extend(['--input', mock_with_embeddings_path])
+        
+        # Now import and run the main function
+        from import_to_neo4j import main
+        return main()
+    finally:
+        # Restore original argv
+        sys.argv = original_argv
+
 @app.on_event("startup")
 async def startup_event():
+    """Startup event handler."""
+    logger.info("Server started")
+    logger.info(f"Actions file path: actions.json")
+    logger.info("Supported webhook events: pull_request, issues, issue_comment, pull_request_review, "
+                "pull_request_review_comment, discussion, discussion_comment, label, push")
     print("server started")
     print(f"Webhook route available at: /webhooks/github")
     
@@ -59,6 +197,18 @@ async def startup_event():
         print(f"  ✅ Slack channel monitoring started for channels: {', '.join(channels_to_monitor)}")
     else:
         print(f"  ⚠️ Slack monitoring not started - missing SLACK_BOT_TOKEN")
+    
+    # Process all nodes and import data to Neo4j
+    try:
+        print("Running process_all_nodes to update embeddings...")
+        run_process_all_nodes()
+        print("✅ Successfully processed all nodes and added embeddings")
+        
+        print("Importing data to Neo4j...")
+        run_import_to_neo4j()
+        print("✅ Successfully imported data to Neo4j")
+    except Exception as e:
+        print(f"❌ Error during data processing or import: {str(e)}")
 
 @app.on_event("shutdown")
 async def shutdown_event():
@@ -67,7 +217,9 @@ async def shutdown_event():
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to Ownership AI API"}
+    """Root endpoint - API health check."""
+    return {"status": "ok", "message": "GitHub webhook handler is running"}
+
 
 @app.get("/slack/monitored-channels")
 async def get_monitored_channels():
@@ -186,69 +338,166 @@ async def update_messages_with_user_info():
 
 @app.get("/test-webhook")
 async def test_webhook_manually():
+    """Test webhook endpoint for manual testing."""
+    return {"status": "success", "message": "Test webhook endpoint"}
+
+# Include the webhooks router
+app.include_router(webhooks_router, prefix="/webhooks", tags=["webhooks"])
+
+@app.get("/fetch-pull-requests/{owner}/{repo}")
+async def fetch_all_prs(owner: str, repo: str):
     """
-    Test endpoint to simulate a GitHub webhook call.
-    This is for debugging and testing purposes only.
-    """
-    # Create a mock GitHub push event payload
-    mock_payload = {
-        "repository": {
-            "full_name": "test-user/test-repo"
-        },
-        "pusher": {
-            "name": "test-user"
-        },
-        "ref": "refs/heads/main",
-        "commits": [
-            {
-                "id": "abc1234567890",
-                "message": "Test commit message",
-                "timestamp": "2023-10-25T12:00:00Z",
-                "url": "https://github.com/test-user/test-repo/commit/abc1234567890",
-                "author": {
-                    "name": "Test User",
-                    "email": "test@example.com"
-                },
-                "added": ["file1.txt"],
-                "modified": ["file2.txt"],
-                "removed": []
-            }
-        ]
-    }
+    Fetch all pull requests from a GitHub repository and save them to collective.json.
     
-    # Convert the payload to JSON
-    payload_bytes = json.dumps(mock_payload).encode('utf-8')
+    This endpoint fetches all pull requests for the specified repository,
+    formats them with fields: id, number, title, body, state, createdAt,
+    and saves them to a file called collective.json.
     
-    # Generate a valid signature using the secret
-    secret = settings.GITHUB_WEBHOOK_SECRET.encode()
-    signature = 'sha256=' + hmac.new(secret, payload_bytes, hashlib.sha256).hexdigest()
-    
-    print("\n===== TEST WEBHOOK CALL =====")
-    print(f"Generated signature: {signature}")
-    
-    # Create a fake request context to pass to the webhook handler
-    headers = {
-        "X-GitHub-Event": "push",
-        "X-Hub-Signature-256": signature,
-        "Content-Type": "application/json"
-    }
-    
-    # Call the webhook handler directly
-    try:
-        # Manually verify the signature first
-        if secret and signature:
-            print("✅ Secret and signature look valid")
+    Args:
+        owner: Repository owner/organization (e.g., "facebook")
+        repo: Repository name (e.g., "react")
         
-        # Call the service function directly with our test payload
-        print("Calling process_push_event with test payload...")
-        await process_push_event(mock_payload)
+    Returns:
+        Information about the fetched pull requests
+    """
+    print("Fetching pull requests...")
+    # if not os.environ.get("GITHUB_TOKEN"):
+    #     raise HTTPException(status_code=500, detail="GitHub token not configured")
+    
+    try:
+        # Fetch all PRs and save to collective.json
+        result = fetch_and_save_all_pull_requests(owner, repo)
+        
+        # Return information about the fetched data
         return {
-            "status": "success", 
-            "message": "Test webhook call simulated successfully"
+            "status": "success",
+            "repository": result["repository"],
+            "timestamp": result["timestamp"],
+            "count": result["count"],
+            "file": "collective.json",
+            "message": f"Successfully fetched and saved {result['count']} pull requests"
         }
     except Exception as e:
-        print(f"❌ Error testing webhook: {str(e)}")
-        return {"status": "error", "message": f"Error: {str(e)}"}
+        logger.error(f"Error fetching pull requests: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error fetching pull requests: {str(e)}")
+
+@app.get("/fetch-issues/{owner}/{repo}")
+async def fetch_all_issues(owner: str, repo: str):
+    """
+    Fetch all issues from a GitHub repository and save them to collective.json.
+    
+    This endpoint fetches all issues for the specified repository,
+    formats them with fields: id, number, title, body, state, createdAt, authorId, repositoryId,
+    and saves them to a file called collective.json.
+    
+    Args:
+        owner: Repository owner/organization (e.g., "facebook")
+        repo: Repository name (e.g., "react")
+        
+    Returns:
+        Information about the fetched issues
+    """
+    print("Fetching issues...")
+    
+    try:
+        # Fetch all issues and save to collective.json
+        result = fetch_and_save_all_issues(owner, repo)
+        
+        # Return information about the fetched data
+        return {
+            "status": "success",
+            "repository": result["repository"],
+            "timestamp": result["timestamp"],
+            "count": result["count"],
+            "file": "collective.json",
+            "message": f"Successfully fetched and saved {result['count']} issues"
+        }
+    except Exception as e:
+        logger.error(f"Error fetching issues: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error fetching issues: {str(e)}")
+
+@app.get("/fetch-all/{owner}/{repo}")
+async def fetch_all_pr_and_issues(owner: str, repo: str):
+    """
+    Fetch all pull requests and issues from a GitHub repository and save them to collective.json.
+    
+    This endpoint fetches all pull requests and issues for the specified repository,
+    formats them with the required fields, and saves them to a file called collective.json.
+    
+    Args:
+        owner: Repository owner/organization (e.g., "facebook")
+        repo: Repository name (e.g., "react")
+        
+    Returns:
+        Information about the fetched data
+    """
+    print("Fetching all pull requests and issues...")
+    
+    try:
+        # Fetch all PRs and issues and save to collective.json
+        result = fetch_and_save_all_pr_and_issues(owner, repo)
+        
+        # Return information about the fetched data
+        return {
+            "status": "success",
+            "repository": result["repository"],
+            "timestamp": result["timestamp"],
+            "pull_requests_count": result["pull_requests_count"],
+            "issues_count": result["issues_count"],
+            "total_count": result["pull_requests_count"] + result["issues_count"],
+            "file": "collective.json",
+            "message": f"Successfully fetched and saved {result['pull_requests_count']} pull requests and {result['issues_count']} issues"
+        }
+    except Exception as e:
+        logger.error(f"Error fetching data: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error fetching data: {str(e)}")
+
+@app.get("/fetch-github-data/{owner}/{repo}")
+async def fetch_all_github_data(owner: str, repo: str):
+    """
+    Fetch all GitHub data in the required format (users, repositories, pullRequests, issues).
+    
+    This endpoint fetches all GitHub data for the specified repository:
+    - Contributors/users with id, githubLogin, name, email
+    - Repository information with id, name, fullName, description
+    - Pull requests with id, number, title, body, state, createdAt, authorId, repositoryId
+    - Issues with id, number, title, body, state, createdAt, authorId, repositoryId
+    
+    All data is saved in collective.json with the specific order: users, repositories, pullRequests, issues.
+    
+    Args:
+        owner: Repository owner/organization (e.g., "facebook")
+        repo: Repository name (e.g., "react")
+        
+    Returns:
+        Information about the fetched data
+    """
+    print("Fetching complete GitHub data...")
+    
+    try:
+        # Fetch all GitHub data and save to collective.json
+        result = fetch_and_save_all_github_data(owner, repo)
+        
+        # Return information about the fetched data
+        return {
+            "status": "success",
+            "repository": result["repository"],
+            "timestamp": result["timestamp"],
+            "contributors_count": result["contributors_count"],
+            "repository_count": 1,
+            "pull_requests_count": result["pull_requests_count"],
+            "issues_count": result["issues_count"],
+            "total_items_count": result["contributors_count"] + 1 + result["pull_requests_count"] + result["issues_count"],
+            "file": "collective.json",
+            "data_format": {
+                "order": ["users", "repositories", "pullRequests", "issues"],
+                "structure": "As requested in the specific format"
+            },
+            "message": f"Successfully fetched GitHub data: {result['contributors_count']} contributors, 1 repository, {result['pull_requests_count']} PRs, {result['issues_count']} issues"
+        }
+    except Exception as e:
+        logger.error(f"Error fetching GitHub data: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error fetching GitHub data: {str(e)}")
 
 @app.get("/slack/thread/{channel_id}/{thread_ts}")
 async def get_thread_replies(channel_id: str, thread_ts: str):
@@ -352,7 +601,6 @@ async def sort_messages_by_thread():
         return {"status": "error", "message": str(e)}
 
 
-
 from pydantic import BaseModel
 
 class ChatQuery(BaseModel):
@@ -377,7 +625,7 @@ async def chat_endpoint_post(chat_query: ChatQuery):
         debug_info = {}
         
         # Call the RAG system with the query
-        answer, node_type, reason = query_rag(query, top_k=5, capture_debug=debug_info)
+        answer, node_type, reason = query_rag(query, top_k=500, capture_debug=debug_info)
         
         return {
             "status": "success",
@@ -396,6 +644,7 @@ async def chat_endpoint_post(chat_query: ChatQuery):
             "message": f"Error processing query: {str(e)}"
         }
 
+<<<<<<< HEAD
 @app.post("/geminichat")
 async def gemini_chat_endpoint_post(chat_query: ChatQuery):
     """
@@ -436,3 +685,7 @@ async def gemini_chat_endpoint_post(chat_query: ChatQuery):
             "query": chat_query.query if hasattr(chat_query, 'query') else "unknown",
             "message": f"Error processing query with Gemini: {str(e)}"
         }
+=======
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+>>>>>>> origin/main
