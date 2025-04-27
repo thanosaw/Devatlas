@@ -48,7 +48,7 @@ async def verify_github_signature(request: Request, x_hub_signature_256: Optiona
     payload_body = await request.body()
     
     # Create our own signature
-    secret = settings.GITHUB_WEBHOOK_SECRET.encode()
+    secret = os.environ.get("GITHUB_WEBHOOK_SECRET", "")
     signature = 'sha256=' + hmac.new(secret, payload_body, hashlib.sha256).hexdigest()
     
     # Compare signatures
