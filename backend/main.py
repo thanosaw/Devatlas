@@ -644,7 +644,6 @@ async def chat_endpoint_post(chat_query: ChatQuery):
             "message": f"Error processing query: {str(e)}"
         }
 
-<<<<<<< HEAD
 @app.post("/geminichat")
 async def gemini_chat_endpoint_post(chat_query: ChatQuery):
     """
@@ -685,7 +684,5 @@ async def gemini_chat_endpoint_post(chat_query: ChatQuery):
             "query": chat_query.query if hasattr(chat_query, 'query') else "unknown",
             "message": f"Error processing query with Gemini: {str(e)}"
         }
-=======
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
->>>>>>> origin/main
