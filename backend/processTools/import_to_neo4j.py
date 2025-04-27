@@ -39,6 +39,8 @@ parser.add_argument('--clear-db', action='store_true',
                     help='Clear the database before importing')
 parser.add_argument('--create-indexes', action='store_true', 
                     help='Create vector indexes for nodes with embeddings')
+parser.add_argument('--include-all-messages', action='store_true',
+                    help='Include all Slack messages (including join messages)')
 args = parser.parse_args()
 
 def load_data(file_path: str) -> Dict[str, Any]:
@@ -70,6 +72,14 @@ def import_nodes(neo4j: Neo4jService, data: Dict[str, Any]) -> Dict[str, int]:
             continue
         
         label = NODE_TYPE_LABELS[collection_name]
+        
+        # Filter out join messages unless --include-all-messages is specified
+        if collection_name == "slackMessages" and not args.include_all_messages:
+            original_count = len(nodes)
+            nodes = [msg for msg in nodes if not msg.get("text", "").endswith("has joined the channel")]
+            filtered_count = original_count - len(nodes)
+            logger.info(f"Filtered out {filtered_count} join messages from {original_count} total messages")
+        
         logger.info(f"Importing {len(nodes)} {label} nodes")
         
         success_count = 0
@@ -181,8 +191,13 @@ def create_relationships(neo4j: Neo4jService, data: Dict[str, Any]) -> Dict[str,
         rel_type = "AUTHORED"
         logger.info(f"Creating {rel_type} relationships for Slack Messages")
         
+        # Filter out join messages if needed
+        slack_messages = data["slackMessages"]
+        if not args.include_all_messages:
+            slack_messages = [msg for msg in slack_messages if not msg.get("text", "").endswith("has joined the channel")]
+        
         success_count = 0
-        for msg in data["slackMessages"]:
+        for msg in slack_messages:
             author_id = msg.get("authorId")
             if author_id:
                 if neo4j.create_relationship("User", author_id, "Message", msg["id"], rel_type):
@@ -196,8 +211,13 @@ def create_relationships(neo4j: Neo4jService, data: Dict[str, Any]) -> Dict[str,
         rel_type = "POSTED_IN"
         logger.info(f"Creating {rel_type} relationships for Slack Messages")
         
+        # Filter out join messages if needed
+        slack_messages = data["slackMessages"]
+        if not args.include_all_messages:
+            slack_messages = [msg for msg in slack_messages if not msg.get("text", "").endswith("has joined the channel")]
+        
         success_count = 0
-        for msg in data["slackMessages"]:
+        for msg in slack_messages:
             channel_id = msg.get("channelId")
             if channel_id:
                 if neo4j.create_relationship("Message", msg["id"], "Channel", channel_id, rel_type):
@@ -211,15 +231,20 @@ def create_relationships(neo4j: Neo4jService, data: Dict[str, Any]) -> Dict[str,
         rel_type = "REPLIES_TO"
         logger.info(f"Creating {rel_type} relationships for Slack Messages")
         
+        # Filter out join messages if needed
+        slack_messages = data["slackMessages"]
+        if not args.include_all_messages:
+            slack_messages = [msg for msg in slack_messages if not msg.get("text", "").endswith("has joined the channel")]
+        
         # Create a mapping of threadTs to message IDs
         thread_ts_to_id = {}
-        for msg in data["slackMessages"]:
+        for msg in slack_messages:
             slack_id = msg.get("slackId")
             if slack_id:
                 thread_ts_to_id[slack_id] = msg["id"]
         
         success_count = 0
-        for msg in data["slackMessages"]:
+        for msg in slack_messages:
             thread_ts = msg.get("threadTs")
             if thread_ts and thread_ts in thread_ts_to_id:
                 parent_id = thread_ts_to_id[thread_ts]
@@ -234,11 +259,16 @@ def create_relationships(neo4j: Neo4jService, data: Dict[str, Any]) -> Dict[str,
         rel_type = "REFERENCES_GITHUB"
         logger.info(f"Creating {rel_type} relationships for Slack Messages")
         
+        # Filter out join messages if needed
+        slack_messages = data["slackMessages"]
+        if not args.include_all_messages:
+            slack_messages = [msg for msg in slack_messages if not msg.get("text", "").endswith("has joined the channel")]
+        
         pr_refs = 0
         issue_refs = 0
         
         # Simplistic approach - in a real system you'd use regex and URL parsing
-        for msg in data["slackMessages"]:
+        for msg in slack_messages:
             text = msg.get("text", "").lower()
             
             # Check for PR references

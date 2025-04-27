@@ -16,6 +16,10 @@ from dotenv import load_dotenv
 # Import the GitHub fetcher
 from backend.services.github_fetch import fetch_and_save_all_pull_requests
 
+# Import processing tools
+# from backend.processTools.process_all_nodes import main as process_all_nodes
+# from backend.processTools.import_to_neo4j import main as import_to_neo4j
+
 # Load environment variables
 load_dotenv()
 
@@ -55,6 +59,108 @@ app.add_middleware(
 # Global variables to store background threads
 slack_monitor_thread = None
 
+# Add these functions to handle the script execution with proper import paths
+def ensure_process_directories():
+    """Ensure all necessary directories and files exist for processing"""
+    import os
+    
+    # Create directories if they don't exist
+    os.makedirs('backend/processTools', exist_ok=True)
+    os.makedirs('processTools', exist_ok=True)
+    
+    # Define file paths that need to exist
+    required_files = {
+        'backend/processTools/mock.json': 'processTools/mock.json',
+        'processTools/mock.json': None,  # Create empty if doesn't exist
+    }
+    
+    # Create or symlink files
+    for target_path, source_path in required_files.items():
+        if not os.path.exists(target_path):
+            if source_path and os.path.exists(source_path):
+                # Create symlink
+                print(f"Creating symlink from {source_path} to {target_path}")
+                os.symlink(os.path.abspath(source_path), target_path)
+            else:
+                # Create empty file
+                print(f"Creating empty file at {target_path}")
+                with open(target_path, 'w') as f:
+                    f.write('{"users":[],"repositories":[],"pullRequests":[],"issues":[],"slackChannels":[],"slackMessages":[],"textChunks":[]}')
+
+def run_process_all_nodes():
+    """Run the process_all_nodes.py script with proper import handling"""
+    import sys
+    import os
+    
+    # Ensure directories and files exist
+    ensure_process_directories()
+    
+    # Add the processTools directory to the Python path
+    process_tools_dir = os.path.join(os.path.dirname(__file__), 'processTools')
+    if process_tools_dir not in sys.path:
+        sys.path.append(process_tools_dir)
+    
+    # Create mock.json if it doesn't exist
+    mock_json_path = os.path.join(process_tools_dir, 'mock.json')
+    if not os.path.exists(mock_json_path):
+        print(f"Creating empty mock.json file at {mock_json_path}")
+        with open(mock_json_path, 'w') as f:
+            f.write('{"users":[],"repositories":[],"pullRequests":[],"issues":[],"slackChannels":[],"slackMessages":[],"textChunks":[]}')
+    
+    # Save original argv
+    original_argv = sys.argv.copy()
+    
+    try:
+        # Set clean argv for the script
+        sys.argv = [sys.argv[0]]  # Keep just the script name
+        print("Running process_all_nodes.py")
+        
+        # Now import and run the main function
+        from process_all_nodes import main
+        return main()
+    finally:
+        # Restore original argv
+        sys.argv = original_argv
+
+def run_import_to_neo4j():
+    """Run the import_to_neo4j.py script with proper import handling"""
+    import sys
+    import os
+    
+    # Add the processTools directory to the Python path
+    process_tools_dir = os.path.join(os.path.dirname(__file__), 'processTools')
+    if process_tools_dir not in sys.path:
+        sys.path.append(process_tools_dir)
+    
+    # Check for mock_with_embeddings.json
+    mock_with_embeddings_path = os.path.join(process_tools_dir, 'mock_with_embeddings.json')
+    if not os.path.exists(mock_with_embeddings_path):
+        print(f"Warning: {mock_with_embeddings_path} not found. Creating a copy from mock.json")
+        mock_json_path = os.path.join(process_tools_dir, 'mock.json')
+        if os.path.exists(mock_json_path):
+            import shutil
+            shutil.copy2(mock_json_path, mock_with_embeddings_path)
+        else:
+            print(f"Error: mock.json not found either, cannot create mock_with_embeddings.json")
+    
+    # Save original argv
+    original_argv = sys.argv.copy()
+    
+    try:
+        # Set clean argv for the script
+        sys.argv = [sys.argv[0]]  # Keep just the script name
+        
+        # Specify input file explicitly
+        print(f"Running import_to_neo4j.py with input file {mock_with_embeddings_path}")
+        sys.argv.extend(['--input', mock_with_embeddings_path])
+        
+        # Now import and run the main function
+        from import_to_neo4j import main
+        return main()
+    finally:
+        # Restore original argv
+        sys.argv = original_argv
+
 @app.on_event("startup")
 async def startup_event():
     """Startup event handler."""
@@ -85,6 +191,18 @@ async def startup_event():
         print(f"  ✅ Slack channel monitoring started for channels: {', '.join(channels_to_monitor)}")
     else:
         print(f"  ⚠️ Slack monitoring not started - missing SLACK_BOT_TOKEN")
+    
+    # Process all nodes and import data to Neo4j
+    try:
+        print("Running process_all_nodes to update embeddings...")
+        run_process_all_nodes()
+        print("✅ Successfully processed all nodes and added embeddings")
+        
+        print("Importing data to Neo4j...")
+        run_import_to_neo4j()
+        print("✅ Successfully imported data to Neo4j")
+    except Exception as e:
+        print(f"❌ Error during data processing or import: {str(e)}")
 
 @app.on_event("shutdown")
 async def shutdown_event():

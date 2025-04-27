@@ -116,27 +116,21 @@
   ],
   "slackChannels": [
     {
-      "id": "ee498b2d-6f26-464c-ba8a-700b3c0da43f",
+      "id": "30c5328e-4a86-47e5-8790-9053a565ba30",
       "slackId": "C08PYHJ2B3N",
       "name": "all-devatlas",
       "isPrivate": false
     },
     {
-      "id": "fa51aa4c-1094-4ccf-bb60-ce3a531a5a2d",
+      "id": "5eeb12e9-b20a-4106-852e-2501ffcf53d7",
       "slackId": "C08PLFR675L",
       "name": "project-lahacks",
-      "isPrivate": false
-    },
-    {
-      "id": "1ee66ce0-72d3-4b2d-9d21-45c685dd28ab",
-      "slackId": "C08PYHJ3ANQ",
-      "name": "social",
       "isPrivate": false
     }
   ],
   "slackMessages": [
     {
-      "id": "f51d2ddd-198e-4e62-b9a8-1edcb5b7c180",
+      "id": "cbcd6543-0314-49ed-998d-f431acc5bfa9",
       "slackId": "uswangandrew",
       "channelId": "C08PYHJ2B3N",
       "text": "@uswangandrew has joined the channel",
@@ -144,23 +138,7 @@
       "createdAt": "2025-04-26T12:52:47.014Z"
     },
     {
-      "id": "087c2384-18ee-413d-b622-bc29ebe7bc6d",
-      "slackId": "U08PYHHT9E0",
-      "channelId": "C08PYHJ2B3N",
-      "text": "<@U08PYHHT9E0> has joined the channel",
-      "threadTs": null,
-      "createdAt": "2025-04-26T12:52:47.014Z"
-    },
-    {
-      "id": "430c37ee-f73f-4bd9-b80e-8727fb88e3b9",
-      "slackId": "uswangandrew",
-      "channelId": "C08PYHJ3ANQ",
-      "text": "@uswangandrew has joined the channel",
-      "threadTs": null,
-      "createdAt": "2025-04-26T12:52:47.249Z"
-    },
-    {
-      "id": "972eee5b-2386-4b44-8efe-d34225525992",
+      "id": "b54a8af7-3ec4-49fb-9bb3-c5812ede9bed",
       "slackId": "michellefeng153",
       "channelId": "C08PYHJ2B3N",
       "text": "@michellefeng153 has joined the channel",
@@ -168,23 +146,7 @@
       "createdAt": "2025-04-26T13:01:33.304Z"
     },
     {
-      "id": "6350576c-c9be-475e-b576-b64221aa13dc",
-      "slackId": "U08Q6RZCK25",
-      "channelId": "C08PYHJ2B3N",
-      "text": "<@U08Q6RZCK25> has joined the channel",
-      "threadTs": null,
-      "createdAt": "2025-04-26T13:01:33.304Z"
-    },
-    {
-      "id": "766f02d9-23ce-433c-98f8-5cfc175b849e",
-      "slackId": "michellefeng153",
-      "channelId": "C08PYHJ3ANQ",
-      "text": "@michellefeng153 has joined the channel",
-      "threadTs": null,
-      "createdAt": "2025-04-26T13:01:33.389Z"
-    },
-    {
-      "id": "fa2d2051-15f6-4d84-a6ea-829fe008ed11",
+      "id": "245f0af8-7313-4d1c-bf4c-a9847e9c3ead",
       "slackId": "michael123.peng",
       "channelId": "C08PYHJ2B3N",
       "text": "@michael123.peng has joined the channel",
@@ -192,23 +154,7 @@
       "createdAt": "2025-04-26T13:01:47.023Z"
     },
     {
-      "id": "d81345be-06b2-41b2-8b16-21715425dde0",
-      "slackId": "U08PYHX1ML4",
-      "channelId": "C08PYHJ2B3N",
-      "text": "<@U08PYHX1ML4> has joined the channel",
-      "threadTs": null,
-      "createdAt": "2025-04-26T13:01:47.023Z"
-    },
-    {
-      "id": "4a016a07-7634-4550-9501-2a00f5703baa",
-      "slackId": "michael123.peng",
-      "channelId": "C08PYHJ3ANQ",
-      "text": "@michael123.peng has joined the channel",
-      "threadTs": null,
-      "createdAt": "2025-04-26T13:01:47.103Z"
-    },
-    {
-      "id": "96120347-5a88-4f13-8ab7-73b6a9c1d2fc",
+      "id": "d24f117a-46bc-4bc8-86de-b18232281daa",
       "slackId": "hyunkim03",
       "channelId": "C08PYHJ2B3N",
       "text": "@hyunkim03 has joined the channel",
@@ -216,23 +162,7 @@
       "createdAt": "2025-04-26T13:01:47.692Z"
     },
     {
-      "id": "98736846-b4b3-4cc4-ab05-715e5529f7f4",
-      "slackId": "U08PDMK2CFR",
-      "channelId": "C08PYHJ2B3N",
-      "text": "<@U08PDMK2CFR> has joined the channel",
-      "threadTs": null,
-      "createdAt": "2025-04-26T13:01:47.692Z"
-    },
-    {
-      "id": "272d4c58-23e0-409d-bcb7-e8a3b45b9f46",
-      "slackId": "hyunkim03",
-      "channelId": "C08PYHJ3ANQ",
-      "text": "@hyunkim03 has joined the channel",
-      "threadTs": null,
-      "createdAt": "2025-04-26T13:01:47.712Z"
-    },
-    {
-      "id": "d187cde1-164a-44b6-a527-5f8681b2176c",
+      "id": "63905a88-6ca3-4619-838a-b144831d1822",
       "slackId": "uswangandrew",
       "channelId": "C08PLFR675L",
       "text": "@uswangandrew has joined the channel",
@@ -240,15 +170,7 @@
       "createdAt": "2025-04-26T13:02:33.641Z"
     },
     {
-      "id": "58f81f51-c0b5-4325-a3cd-65803196bcb8",
-      "slackId": "U08PYHHT9E0",
-      "channelId": "C08PLFR675L",
-      "text": "<@U08PYHHT9E0> has joined the channel",
-      "threadTs": null,
-      "createdAt": "2025-04-26T13:02:33.641Z"
-    },
-    {
-      "id": "2970ae66-d3ff-4ba1-8f18-be423d5bd8ee",
+      "id": "5d9fab0d-0d79-4a2f-9cd0-00ba33ead47e",
       "slackId": "hyunkim03",
       "channelId": "C08PLFR675L",
       "text": "@hyunkim03 has joined the channel",
@@ -256,15 +178,7 @@
       "createdAt": "2025-04-26T13:02:36.195Z"
     },
     {
-      "id": "984f6cbe-8a01-493d-9060-e9a1f97ae682",
-      "slackId": "U08PDMK2CFR",
-      "channelId": "C08PLFR675L",
-      "text": "<@U08PDMK2CFR> has joined the channel",
-      "threadTs": null,
-      "createdAt": "2025-04-26T13:02:36.195Z"
-    },
-    {
-      "id": "dcd7580c-061a-46bc-9149-c47d8dd491e7",
+      "id": "a86922c7-3158-4e38-b6d7-a0fe0e5df46f",
       "slackId": "michael123.peng",
       "channelId": "C08PLFR675L",
       "text": "@michael123.peng has joined the channel",
@@ -272,15 +186,7 @@
       "createdAt": "2025-04-26T13:02:36.379Z"
     },
     {
-      "id": "08167079-c1e6-49ad-ba0a-c1598e03ce75",
-      "slackId": "U08PYHX1ML4",
-      "channelId": "C08PLFR675L",
-      "text": "<@U08PYHX1ML4> has joined the channel",
-      "threadTs": null,
-      "createdAt": "2025-04-26T13:02:36.379Z"
-    },
-    {
-      "id": "52390e78-ce8f-4490-aa5d-631a659adadf",
+      "id": "4004c903-fc7d-46b6-a258-b944ee10c459",
       "slackId": "michellefeng153",
       "channelId": "C08PLFR675L",
       "text": "@michellefeng153 has joined the channel",
@@ -288,15 +194,7 @@
       "createdAt": "2025-04-26T13:02:36.515Z"
     },
     {
-      "id": "4dcad41e-fb01-4847-aa93-f87d1e5e3f65",
-      "slackId": "U08Q6RZCK25",
-      "channelId": "C08PLFR675L",
-      "text": "<@U08Q6RZCK25> has joined the channel",
-      "threadTs": null,
-      "createdAt": "2025-04-26T13:02:36.515Z"
-    },
-    {
-      "id": "a9305554-431c-4192-99f3-2e73ba965827",
+      "id": "4c5c437e-e6e6-41d4-b8da-3c1d63cc0e09",
       "slackId": "uswangandrew",
       "channelId": "C08PLFR675L",
       "text": "Web-ui will be used primarily by PMs and Managers, ones that want to see who has been contributing to a codebase and what they've been contributing to the overall project.\n\nEngineers will primarily use the VSCode extension facing side of the product - where you can ask questions about functions, proprietary APIs, past decisions, and code conventions",
@@ -304,7 +202,7 @@
       "createdAt": "2025-04-26T13:04:42.499Z"
     },
     {
-      "id": "2379f264-5a6c-4706-a319-5091f76fa559",
+      "id": "c269b47c-0271-4ff6-ae37-73896cabb7e3",
       "slackId": "slackbot",
       "channelId": "C08PLFR675L",
       "text": "",
@@ -312,7 +210,7 @@
       "createdAt": "2025-04-26T13:07:49.678Z"
     },
     {
-      "id": "267896c1-ab01-4c96-8bd6-4980d3e92ad7",
+      "id": "0d9dc987-4462-44d5-8836-c834dd727bd4",
       "slackId": "uswangandrew",
       "channelId": "C08PYHJ2B3N",
       "text": "Hi all !",
@@ -320,7 +218,7 @@
       "createdAt": "2025-04-26T13:41:29.805Z"
     },
     {
-      "id": "c9d8468a-51b0-40e8-b794-b97d82b6e108",
+      "id": "1acb1a87-6fdb-419d-b6dd-50b088b19a7b",
       "slackId": "devatlas",
       "channelId": "C08PYHJ2B3N",
       "text": "@devatlas has joined the channel",
@@ -328,15 +226,7 @@
       "createdAt": "2025-04-26T14:25:41.042Z"
     },
     {
-      "id": "bcce80be-d1b5-487d-8d82-6a0f6cbce4d1",
-      "slackId": "U08PYJY7QNQ",
-      "channelId": "C08PYHJ2B3N",
-      "text": "<@U08PYJY7QNQ> has joined the channel",
-      "threadTs": null,
-      "createdAt": "2025-04-26T14:25:41.042Z"
-    },
-    {
-      "id": "9b110f55-64e5-4e5a-973b-fa0e2e1b4fb0",
+      "id": "a1ee1de8-540c-4e84-9a61-4e2ce0cba183",
       "slackId": "uswangandrew",
       "channelId": "C08PYHJ2B3N",
       "text": "test",
@@ -344,7 +234,7 @@
       "createdAt": "2025-04-26T14:25:44.418Z"
     },
     {
-      "id": "23c605da-40c1-42ec-8ccd-57a57e7592da",
+      "id": "dba34185-e695-4ea7-bc50-7c4662ea7bcc",
       "slackId": "hyunkim03",
       "channelId": "C08PYHJ2B3N",
       "text": "hi",
@@ -352,7 +242,7 @@
       "createdAt": "2025-04-26T14:33:36.850Z"
     },
     {
-      "id": "8b5da3f0-5cee-47a6-8b04-7f0ab42ab026",
+      "id": "0265ca3b-a5e5-481c-92c5-1bfb1d2a89bc",
       "slackId": "uswangandrew",
       "channelId": "C08PYHJ2B3N",
       "text": "some message to command f",
@@ -360,7 +250,7 @@
       "createdAt": "2025-04-26T16:11:25.747Z"
     },
     {
-      "id": "0d3874e1-37c6-4a79-9ec3-c539c29795bc",
+      "id": "46683d8f-fc09-4745-9bab-df8f694fa5c0",
       "slackId": "uswangandrew",
       "channelId": "C08PYHJ2B3N",
       "text": "hi",
@@ -368,7 +258,7 @@
       "createdAt": "2025-04-26T14:55:36.966Z"
     },
     {
-      "id": "e0e1f72b-4ed6-4321-9d3a-e695b0f11098",
+      "id": "d4cffff3-2679-4b71-9e7f-38853a1d68ec",
       "slackId": "uswangandrew",
       "channelId": "C08PYHJ2B3N",
       "text": "test number 3",
@@ -376,7 +266,7 @@
       "createdAt": "2025-04-26T14:57:30.330Z"
     },
     {
-      "id": "4094b077-e37f-4f3c-a3de-3100ea43c346",
+      "id": "49789630-d5d7-4a16-9c08-53f92ef096a9",
       "slackId": "uswangandrew",
       "channelId": "C08PYHJ2B3N",
       "text": "forty borty",
@@ -384,7 +274,7 @@
       "createdAt": "2025-04-26T14:57:42.525Z"
     },
     {
-      "id": "41720952-f754-48ea-aec5-719d63fbb665",
+      "id": "311c478e-af5a-47e8-a147-6f3433af24ce",
       "slackId": "uswangandrew",
       "channelId": "C08PYHJ2B3N",
       "text": "spam",
@@ -392,7 +282,7 @@
       "createdAt": "2025-04-26T14:59:14.601Z"
     },
     {
-      "id": "deb1215f-7afc-493a-906a-c4f89c66d7a3",
+      "id": "dc35731c-0749-4e84-8ec6-8cda42c18503",
       "slackId": "uswangandrew",
       "channelId": "C08PYHJ2B3N",
       "text": "spam",
@@ -400,7 +290,7 @@
       "createdAt": "2025-04-26T15:06:09.683Z"
     },
     {
-      "id": "ae12c8c2-2d8f-4a95-a1a9-2aa7f840d59d",
+      "id": "48cbb150-7ba9-4531-8585-83a032d0ef54",
       "slackId": "uswangandrew",
       "channelId": "C08PYHJ2B3N",
       "text": "oh",
@@ -408,7 +298,7 @@
       "createdAt": "2025-04-26T15:06:28.172Z"
     },
     {
-      "id": "7d77a3a2-5759-442a-aa00-00dd002ecaea",
+      "id": "5e8efb39-d599-4420-8318-2b49cc8821c3",
       "slackId": "devatlas",
       "channelId": "C08PLFR675L",
       "text": "@devatlas has joined the channel",
@@ -416,15 +306,7 @@
       "createdAt": "2025-04-26T15:07:29.732Z"
     },
     {
-      "id": "22214aed-c889-46d2-8ee0-efefc7319b50",
-      "slackId": "U08PYJY7QNQ",
-      "channelId": "C08PLFR675L",
-      "text": "<@U08PYJY7QNQ> has joined the channel",
-      "threadTs": null,
-      "createdAt": "2025-04-26T15:07:29.732Z"
-    },
-    {
-      "id": "21065f64-8cb2-485e-95b9-57e964891064",
+      "id": "bec18491-cda5-4717-aaae-42213d24399f",
       "slackId": "uswangandrew",
       "channelId": "C08PYHJ2B3N",
       "text": "asdsada",
@@ -432,7 +314,7 @@
       "createdAt": "2025-04-26T15:10:52.285Z"
     },
     {
-      "id": "04656dd9-da02-41b5-89d9-cff566e9e589",
+      "id": "0fea4d4e-d1b7-47c0-bef7-cd84a52b2e09",
       "slackId": "uswangandrew",
       "channelId": "C08PYHJ2B3N",
       "text": "test",
@@ -440,7 +322,7 @@
       "createdAt": "2025-04-26T15:12:50.152Z"
     },
     {
-      "id": "cea52661-ba71-46d9-a0f7-0045f3d9a816",
+      "id": "e3a38582-e17d-4e97-86fe-b8384cf6fe6d",
       "slackId": "uswangandrew",
       "channelId": "C08PYHJ2B3N",
       "text": "identifiable",
@@ -448,7 +330,7 @@
       "createdAt": "2025-04-26T15:39:32.711Z"
     },
     {
-      "id": "65089fde-34c4-4141-b995-d1e984035145",
+      "id": "d1b51f61-e7b6-4ec4-83c7-59696c42e24b",
       "slackId": "michael123.peng",
       "channelId": "C08PYHJ2B3N",
       "text": "hello!",
@@ -456,7 +338,7 @@
       "createdAt": "2025-04-26T15:48:33.853Z"
     },
     {
-      "id": "a8157b4b-6d9a-42bb-bb4b-573630fb4568",
+      "id": "340e2b8d-3821-40aa-bc7c-3d63f263c4e3",
       "slackId": "uswangandrew",
       "channelId": "C08PYHJ2B3N",
       "text": "how is everyone doing today",
@@ -464,7 +346,7 @@
       "createdAt": "2025-04-26T16:50:12.551Z"
     },
     {
-      "id": "1caa0204-d892-467b-836d-4be9c4cf12b2",
+      "id": "ca9ad442-b0ab-44b3-aabb-06b4f468d2b9",
       "slackId": "hyunkim03",
       "channelId": "C08PYHJ2B3N",
       "text": "hi",
@@ -472,7 +354,7 @@
       "createdAt": "2025-04-26T16:50:13.252Z"
     },
     {
-      "id": "1a6758cb-59fd-4b94-8ed3-3e7ee1564171",
+      "id": "4ac2c886-0037-4cbc-9a68-76007bd543c9",
       "slackId": "uswangandrew",
       "channelId": "C08PYHJ2B3N",
       "text": "a tree fell on my house",
@@ -480,7 +362,7 @@
       "createdAt": "2025-04-26T16:50:14.505Z"
     },
     {
-      "id": "10260b21-d7b0-4ec6-b87e-8cae69dc4422",
+      "id": "112c8acf-18fe-4d2e-93fe-c913c950b2e9",
       "slackId": "hyunkim03",
       "channelId": "C08PYHJ2B3N",
       "text": "oh no",
@@ -488,7 +370,7 @@
       "createdAt": "2025-04-26T16:50:18.575Z"
     },
     {
-      "id": "a85d3d17-2adb-48b9-9f0b-071b5c524be1",
+      "id": "b140f63f-48ad-440c-add4-3b936ff782aa",
       "slackId": "hyunkim03",
       "channelId": "C08PYHJ2B3N",
       "text": "thats so sad",
@@ -496,7 +378,7 @@
       "createdAt": "2025-04-26T16:50:20.531Z"
     },
     {
-      "id": "e14283c2-9567-42a3-8612-4406b4ad48e4",
+      "id": "1d5fc6e9-cbd5-4aeb-b806-112bf6953a78",
       "slackId": "hyunkim03",
       "channelId": "C08PYHJ2B3N",
       "text": "can i do anything to help",
@@ -504,7 +386,7 @@
       "createdAt": "2025-04-26T16:50:25.776Z"
     },
     {
-      "id": "b838e37b-09e5-4b1a-bd9d-c8dd162dac53",
+      "id": "c4110240-b528-4721-9edc-a4bc3e6be22e",
       "slackId": "uswangandrew",
       "channelId": "C08PYHJ2B3N",
       "text": "no unfortunately my kitchen gas stove exlpoded on contact and everyone caught on fire",
@@ -512,7 +394,7 @@
       "createdAt": "2025-04-26T16:50:43.118Z"
     },
     {
-      "id": "a2eabd6e-edc3-4cf1-9a51-3ed11ba54128",
+      "id": "c45e332f-457b-4aef-ae4f-71edb864c4c5",
       "slackId": "uswangandrew",
       "channelId": "C08PYHJ2B3N",
       "text": "fetch ai ressed my family",
@@ -520,7 +402,7 @@
       "createdAt": "2025-04-26T16:54:19.306Z"
     },
     {
-      "id": "62b8fec2-65a9-424f-975c-9d0c1cc07fa7",
+      "id": "ee6468bd-c402-475e-8b6c-98bfb6c4ecc5",
       "slackId": "uswangandrew",
       "channelId": "C08PYHJ2B3N",
       "text": "project is going well! test",
@@ -528,7 +410,7 @@
       "createdAt": "2025-04-26T17:24:12.203Z"
     },
     {
-      "id": "f997c667-e4ff-4810-a295-5d2d2fb35827",
+      "id": "b8ee8222-67aa-435f-b883-0b99601d9438",
       "slackId": "uswangandrew",
       "channelId": "C08PYHJ2B3N",
       "text": "test 3031940928401938",
@@ -536,7 +418,7 @@
       "createdAt": "2025-04-26T17:26:45.760Z"
     },
     {
-      "id": "7b3dafe7-5d17-482b-bdba-4e200903d861",
+      "id": "484933e6-785b-4da6-94bf-c8915bf284bb",
       "slackId": "uswangandrew",
       "channelId": "C08PYHJ2B3N",
       "text": "hihihi",
@@ -544,23 +426,7 @@
       "createdAt": "2025-04-26T17:27:58.035Z"
     },
     {
-      "id": "54c6bdb4-f23a-4fd5-b903-6b7060b9bc24",
-      "slackId": "devatlas",
-      "channelId": "C08PYHJ3ANQ",
-      "text": "@devatlas has joined the channel",
-      "threadTs": null,
-      "createdAt": "2025-04-26T17:57:43.154Z"
-    },
-    {
-      "id": "c57a33d7-e73b-4da9-9055-fe823cac0b11",
-      "slackId": "uswangandrew",
-      "channelId": "C08PYHJ3ANQ",
-      "text": "agent bond",
-      "threadTs": null,
-      "createdAt": "2025-04-26T18:00:54.661Z"
-    },
-    {
-      "id": "68f73368-8dbe-4ff0-9fcf-c5d791e116b8",
+      "id": "bd0d821a-a4cf-48d7-8abf-dd37a6492bcc",
       "slackId": "hyunkim03",
       "channelId": "C08PYHJ2B3N",
       "text": "Hey by the way I integrated the knowledge graph",
@@ -568,7 +434,7 @@
       "createdAt": "2025-04-26T19:51:08.109Z"
     },
     {
-      "id": "9092de24-41eb-49df-95de-50b5b53e4040",
+      "id": "f086ee4e-c681-4bee-901d-8a2db74796df",
       "slackId": "hyunkim03",
       "channelId": "C08PYHJ2B3N",
       "text": "I ran into some bugs when it came to a RAG",
@@ -576,7 +442,7 @@
       "createdAt": "2025-04-26T19:51:18.486Z"
     },
     {
-      "id": "fbb8798d-7bd7-40aa-9ef2-efa3d640ce51",
+      "id": "71eaecd6-049a-4a7a-924b-964b9ae75f69",
       "slackId": "hyunkim03",
       "channelId": "C08PYHJ2B3N",
       "text": "I just used AS1 for the LLM",
@@ -584,7 +450,7 @@
       "createdAt": "2025-04-26T19:51:20.755Z"
     },
     {
-      "id": "8896c550-8510-4234-bac7-e40646157c99",
+      "id": "81dffa12-9be3-49f2-8284-0e07e5484102",
       "slackId": "uswangandrew",
       "channelId": "C08PYHJ2B3N",
       "text": "Thank you so much daniel for integrating that! What's the status on importing data from  my slack function?",
@@ -592,7 +458,7 @@
       "createdAt": "2025-04-26T19:51:32.214Z"
     },
     {
-      "id": "a9f662f4-e2a2-4401-a2d9-1868b5ced41b",
+      "id": "3003e18d-15ef-4e79-bc81-1f5b4c65713d",
       "slackId": "hyunkim03",
       "channelId": "C08PYHJ2B3N",
       "text": "I think the RAG is going well, almost done",
@@ -600,7 +466,7 @@
       "createdAt": "2025-04-26T19:51:42.557Z"
     },
     {
-      "id": "bfaeee10-761f-4b22-8a7b-617d316e5144",
+      "id": "1d82fbcc-0ad2-435d-9d02-a1b0b5dce61f",
       "slackId": "hyunkim03",
       "channelId": "C08PYHJ2B3N",
       "text": "Will start getting on top of the frontend soon",
@@ -608,7 +474,7 @@
       "createdAt": "2025-04-26T19:51:49.347Z"
     },
     {
-      "id": "d02b021b-e887-4488-a66d-e344488c2d3e",
+      "id": "46580b3c-7f8e-4447-a57c-dfe564e9d271",
       "slackId": "uswangandrew",
       "channelId": "C08PYHJ2B3N",
       "text": "Im working on the vscode extensino right now",
@@ -616,7 +482,7 @@
       "createdAt": "2025-04-26T19:54:43.107Z"
     },
     {
-      "id": "20b6784c-c6ce-4cc1-b504-b3d19462940a",
+      "id": "e8f44b45-80e0-4611-ac5b-8274cc4e9382",
       "slackId": "uswangandrew",
       "channelId": "C08PYHJ2B3N",
       "text": "current plan is to hold an iframe inside a VSCODE sidebar that links to our frontend web app",
@@ -624,7 +490,7 @@
       "createdAt": "2025-04-26T19:54:57.533Z"
     },
     {
-      "id": "4824a476-0a67-4255-b5f6-c46ffb79d071",
+      "id": "ce91b0ef-8424-4f44-a068-db1a81eb34e5",
       "slackId": "uswangandrew",
       "channelId": "C08PLFR675L",
       "text": "Working on ai integratino",
@@ -632,12 +498,180 @@
       "createdAt": "2025-04-26T21:24:51.226Z"
     },
     {
-      "id": "6ca90e5e-4dad-4140-aa07-207fa0e75b94",
+      "id": "41993c84-aa87-44cf-ad35-36ad71e20b3d",
       "slackId": "hyunkim03",
       "channelId": "C08PYHJ2B3N",
       "text": "im working on the frontend right now",
       "threadTs": null,
       "createdAt": "2025-04-26T22:46:02.963Z"
+    },
+    {
+      "id": "13604dc4-f64d-4d21-b40f-1b35b2c57e38",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ2B3N",
+      "text": "im working on rag implementation",
+      "threadTs": null,
+      "createdAt": "2025-04-26T23:43:38.032Z"
+    },
+    {
+      "id": "4f803095-8464-494e-8714-47aaf32e1904",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ2B3N",
+      "text": "the rag should be able to read our messages",
+      "threadTs": null,
+      "createdAt": "2025-04-26T23:43:42.135Z"
+    },
+    {
+      "id": "5fbae29e-caea-47bf-991f-056661cd7112",
+      "slackId": "devatlas",
+      "channelId": "C08PYHJ2B3N",
+      "text": "@devatlas has joined the channel",
+      "threadTs": null,
+      "createdAt": "2025-04-26T23:58:25.865Z"
+    },
+    {
+      "id": "76ea3622-f5a6-49b2-9679-7726b753fb84",
+      "slackId": "devatlas",
+      "channelId": "C08PLFR675L",
+      "text": "@devatlas has joined the channel",
+      "threadTs": null,
+      "createdAt": "2025-04-26T23:58:30.811Z"
+    },
+    {
+      "id": "d73302d5-e725-4726-a453-2354c6b89671",
+      "slackId": "hyunkim03",
+      "channelId": "C08PYHJ2B3N",
+      "text": "I am wokring on the frontend",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:29:26.777Z"
+    },
+    {
+      "id": "fffc8b58-5bec-4149-8080-25eecf6acade",
+      "slackId": "hyunkim03",
+      "channelId": "C08PYHJ2B3N",
+      "text": "I got the chatbot interface to work",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:29:30.701Z"
+    },
+    {
+      "id": "7631ebab-52e2-4ed9-8d55-5817cf1cdf52",
+      "slackId": "hyunkim03",
+      "channelId": "C08PYHJ2B3N",
+      "text": "I have a knowledge graph visuzalization",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:29:38.202Z"
+    },
+    {
+      "id": "5c14e2e9-0e79-474c-90c6-e7bdb2e72ec5",
+      "slackId": "uswangandrew",
+      "channelId": "C08PLFR675L",
+      "text": "alskdjkasdjalsdjalksd",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:34:59.764Z"
+    },
+    {
+      "id": "9a88fbf7-13f1-43fa-a83a-1b8c9b06c888",
+      "slackId": "uswangandrew",
+      "channelId": "C08PLFR675L",
+      "text": "salkdjasldkjalsd",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:35:00.309Z"
+    },
+    {
+      "id": "93b1907a-e763-48f8-861c-d9eb5db27c4f",
+      "slackId": "uswangandrew",
+      "channelId": "C08PLFR675L",
+      "text": "hihi",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:35:01.076Z"
+    },
+    {
+      "id": "ff889887-7990-4162-8b2f-a8b4e076541a",
+      "slackId": "uswangandrew",
+      "channelId": "C08PLFR675L",
+      "text": "ih",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:35:01.430Z"
+    },
+    {
+      "id": "ab128a6c-f747-42db-bae4-90b923277b16",
+      "slackId": "uswangandrew",
+      "channelId": "C08PLFR675L",
+      "text": "ih",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:35:01.746Z"
+    },
+    {
+      "id": "b96d62b0-4b5b-4669-8ff8-477b4f0b745b",
+      "slackId": "uswangandrew",
+      "channelId": "C08PLFR675L",
+      "text": "ihi",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:35:01.995Z"
+    },
+    {
+      "id": "4687378c-2b8d-4d2b-8013-3230b932af7e",
+      "slackId": "uswangandrew",
+      "channelId": "C08PLFR675L",
+      "text": "ih",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:35:02.255Z"
+    },
+    {
+      "id": "2a9f9046-cdbd-434d-ae10-057348a04d64",
+      "slackId": "uswangandrew",
+      "channelId": "C08PLFR675L",
+      "text": "hi",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:35:02.820Z"
+    },
+    {
+      "id": "abccc57d-d9ab-4a35-8e40-08f1f250eb70",
+      "slackId": "uswangandrew",
+      "channelId": "C08PLFR675L",
+      "text": "hi",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:35:03.205Z"
+    },
+    {
+      "id": "9a373b7f-bec7-40fa-b013-4de54ef21a0e",
+      "slackId": "uswangandrew",
+      "channelId": "C08PLFR675L",
+      "text": "hi",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:35:03.536Z"
+    },
+    {
+      "id": "8d2856f8-e6c7-48d0-b87d-a8cce4189dd1",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ2B3N",
+      "text": "I am GETTING CLOSE TO GETTING EVERYTHING DONE",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:35:31.296Z"
+    },
+    {
+      "id": "3fc9e27f-d669-4350-b08b-98623e393187",
+      "slackId": "hyunkim03",
+      "channelId": "C08PYHJ2B3N",
+      "text": "I am implementing Gemini",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:36:15.909Z"
+    },
+    {
+      "id": "ef648605-84b0-4d87-a2f7-438b34de02d5",
+      "slackId": "hyunkim03",
+      "channelId": "C08PYHJ2B3N",
+      "text": "I implemented AS1 in the RAG System",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:36:23.104Z"
+    },
+    {
+      "id": "7b922954-6c38-4964-b8e3-37d365ac11a5",
+      "slackId": "hyunkim03",
+      "channelId": "C08PYHJ2B3N",
+      "text": "I implemented ASI1-mini in the RAG System, utilizing Fetch,AI\u2019s capabilities",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:36:23.104Z"
     }
   ],
   "textChunks": [
