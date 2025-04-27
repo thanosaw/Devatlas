@@ -1,12 +1,15 @@
 from pydantic_settings import BaseSettings
 import os
 from dotenv import load_dotenv
+from typing import Optional
 
 # Load environment variables from .env file
 load_dotenv()
 
 class Settings(BaseSettings):
-    """Application settings."""
+    """
+    Application settings loaded from environment variables
+    """
     # Server settings
     PORT: int = int(os.getenv("PORT", 8000))
 
@@ -25,9 +28,24 @@ class Settings(BaseSettings):
     agent_seed: str = os.getenv("agent_seed", "")
     agent_address: str = os.getenv("agent_address", "")
 
+    # Neo4j settings
+    NEO4J_URI: str = "neo4j://localhost:7687"
+    NEO4J_USERNAME: str = "neo4j"
+    NEO4J_PASSWORD: str = "password"
+
+    # API Keys for AI services
+    OPENAI_API_KEY: Optional[str] = None
+    GEMINI_API_KEY: Optional[str] = None
+    AS1_API_KEY: Optional[str] = None
+
+    # Alternative lowercase versions to match possible environment variables
+    gemini_api_key: Optional[str] = None
+    as1_api_key: Optional[str] = None
+
     class Config:
         """Pydantic config"""
         env_file = ".env"
+        case_sensitive = True
         extra = "ignore"  # Ignore extra fields to prevent validation errors
 
 settings = Settings()
