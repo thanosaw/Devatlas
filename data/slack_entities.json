@@ -445,7 +445,111 @@
       "text": "I am wokring on the frontend",
       "threadTs": null,
       "createdAt": "2025-04-27T00:29:26.777Z"
+    },
+    {
+      "id": "d2bdb8b6-003c-46be-b8be-7545382f3f28",
+      "slackId": "hyunkim03",
+      "channelId": "C08PYHJ2B3N",
+      "text": "I implemented ASI1-mini in the RAG System, utilizing Fetch,AI\u2019s capabilities",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:36:23.104Z"
+    },
+    {
+      "id": "682eadce-e4cf-4064-9a45-5edd08ce1139",
+      "slackId": "hyunkim03",
+      "channelId": "C08PYHJ2B3N",
+      "text": "I am implementing Gemini",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:36:15.909Z"
+    },
+    {
+      "id": "157171fa-0b4c-4621-8b21-81b8529e45b6",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ2B3N",
+      "text": "I am GETTING CLOSE TO GETTING EVERYTHING DONE",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:35:31.296Z"
+    },
+    {
+      "id": "8ef459ca-2313-4b05-b9d4-3861ca855ae2",
+      "slackId": "uswangandrew",
+      "channelId": "C08PLFR675L",
+      "text": "hi",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:35:03.536Z"
+    },
+    {
+      "id": "375f3179-b31f-4adb-bcb4-784bc673efc3",
+      "slackId": "uswangandrew",
+      "channelId": "C08PLFR675L",
+      "text": "hi",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:35:03.205Z"
+    },
+    {
+      "id": "320cc4c7-0b08-44e7-aa3b-db329777c79f",
+      "slackId": "uswangandrew",
+      "channelId": "C08PLFR675L",
+      "text": "hi",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:35:02.820Z"
+    },
+    {
+      "id": "738c05ae-c452-4eab-8c4a-77877e1ecb5d",
+      "slackId": "uswangandrew",
+      "channelId": "C08PLFR675L",
+      "text": "ih",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:35:02.255Z"
+    },
+    {
+      "id": "ff279ee9-c639-4351-8804-d074943fda2d",
+      "slackId": "uswangandrew",
+      "channelId": "C08PLFR675L",
+      "text": "ihi",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:35:01.995Z"
+    },
+    {
+      "id": "8da21bf3-52db-4f86-a105-8f92dc3d7236",
+      "slackId": "uswangandrew",
+      "channelId": "C08PLFR675L",
+      "text": "ih",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:35:01.746Z"
+    },
+    {
+      "id": "7fa3078f-5c78-4a26-a0bf-6301847aaac1",
+      "slackId": "uswangandrew",
+      "channelId": "C08PLFR675L",
+      "text": "ih",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:35:01.430Z"
+    },
+    {
+      "id": "d06e899f-23c8-4bc8-85f2-1c0cc48a74ff",
+      "slackId": "uswangandrew",
+      "channelId": "C08PLFR675L",
+      "text": "hihi",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:35:01.076Z"
+    },
+    {
+      "id": "dc51d622-cf78-4f7b-a875-b6a22acf6eaf",
+      "slackId": "uswangandrew",
+      "channelId": "C08PLFR675L",
+      "text": "salkdjasldkjalsd",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:35:00.309Z"
+    },
+    {
+      "id": "51cdc45b-a5e4-4302-8c04-06402f9d3b15",
+      "slackId": "uswangandrew",
+      "channelId": "C08PLFR675L",
+      "text": "alskdjkasdjalsdjalksd",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:34:59.764Z"
     }
   ],
-  "last_updated": "2025-04-27T00:29:39.886857"
+  "last_updated": "2025-04-27T00:50:41.711693"
 }

@@ -67,7 +67,9 @@ class GitHubFetcher:
                     "title": pr.get("title", ""),
                     "body": pr.get("body", ""),
                     "state": pr.get("state", ""),
-                    "createdAt": pr.get("created_at", "")
+                    "createdAt": pr.get("created_at", ""),
+                    "authorId": f"user-{pr.get('user', {}).get('id', '')}" if pr.get('user') else None,
+                    "repositoryId": f"repo-{self.owner}-{self.repo}"
                 }
                 
                 formatted_prs.append(formatted_pr)
@@ -114,7 +116,9 @@ class GitHubFetcher:
             "title": pr.get("title", ""),
             "body": pr.get("body", ""),
             "state": pr.get("state", ""),
-            "createdAt": pr.get("created_at", "")
+            "createdAt": pr.get("created_at", ""),
+            "authorId": f"user-{pr.get('user', {}).get('id', '')}" if pr.get('user') else None,
+            "repositoryId": f"repo-{self.owner}-{self.repo}"
         }
         
         return formatted_pr
@@ -159,7 +163,9 @@ class GitHubFetcher:
                     "title": pr.get("title", ""),
                     "body": pr.get("body", ""),
                     "state": pr.get("state", ""),
-                    "createdAt": pr.get("created_at", "")
+                    "createdAt": pr.get("created_at", ""),
+                    "authorId": f"user-{pr.get('user', {}).get('id', '')}" if pr.get('user') else None,
+                    "repositoryId": f"repo-{self.owner}-{self.repo}"
                 }
                 
                 formatted_prs.append(formatted_pr)
