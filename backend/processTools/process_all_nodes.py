@@ -10,6 +10,13 @@ from typing import Dict, Any, List
 from embedding_service import EmbeddingService
 from update_mock_data import update_mock_with_slack_data, update_mock_with_github_data
 
+from github_fetch import (
+    fetch_and_save_all_pull_requests, 
+    fetch_and_save_all_issues, 
+    fetch_and_save_all_pr_and_issues,
+    fetch_and_save_all_github_data
+)
+
 # Using more flexible path resolution
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 INPUT_FILE = os.path.join(CURRENT_DIR, "mock.json")
@@ -64,6 +71,7 @@ def process_all_nodes(data: Dict[str, Any], embedding_service: EmbeddingService)
 
 def main():
     # First fetch the latest GitHub data from the API
+
     print("Fetching latest GitHub data from API...")
     try:
         response = requests.get("http://127.0.0.1:8000/fetch-github-data/MichaelPeng123/lahacks2025")
@@ -79,6 +87,9 @@ def main():
 
     
     # Only continue here if GitHub data was successfully fetched
+
+    #fetch_and_save_all_github_data("MichaelPeng123", "lahacks2025")
+    
     print("GitHub data successfully fetched, continuing with process...")
     
     # Update mock.json with Slack data
