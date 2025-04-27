@@ -3,6 +3,30 @@
 # app = FastAPI()
 # app.include_router(webhooks.router, prefix="/webhooks", tags=["webhooks"])
 
+from fastapi import FastAPI, Request, Depends, HTTPException, Query
+import logging
+import uvicorn
+from backend.routes.webhooks import router as webhooks_router
+from backend.services.github_processor import GitHubProcessor
+from fastapi.middleware.cors import CORSMiddleware
+import os
+from typing import List, Dict, Any, Optional
+from dotenv import load_dotenv
+
+# Import the GitHub fetcher
+from backend.services.github_fetch import fetch_and_save_all_pull_requests
+
+# Load environment variables
+load_dotenv()
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+app = FastAPI(title="LA Hacks 2025 Webhook Handler")
 from fastapi import FastAPI, Request, Response, Header, Depends
 import json
 import hmac
@@ -22,19 +46,22 @@ app = FastAPI()
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Frontend dev server
+    allow_origins=["*"],  # Allows all origins
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
 )
-
-app.include_router(webhooks.router, prefix="/webhooks", tags=["webhooks"])
 
 # Global variables to store background threads
 slack_monitor_thread = None
 
 @app.on_event("startup")
 async def startup_event():
+    """Startup event handler."""
+    logger.info("Server started")
+    logger.info(f"Actions file path: actions.json")
+    logger.info("Supported webhook events: pull_request, issues, issue_comment, pull_request_review, "
+                "pull_request_review_comment, discussion, discussion_comment, label, push")
     print("server started")
     print(f"Webhook route available at: /webhooks/github")
     
@@ -66,7 +93,9 @@ async def shutdown_event():
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to Ownership AI API"}
+    """Root endpoint - API health check."""
+    return {"status": "ok", "message": "GitHub webhook handler is running"}
+
 
 @app.get("/slack/monitored-channels")
 async def get_monitored_channels():
@@ -185,69 +214,48 @@ async def update_messages_with_user_info():
 
 @app.get("/test-webhook")
 async def test_webhook_manually():
+    """Test webhook endpoint for manual testing."""
+    return {"status": "success", "message": "Test webhook endpoint"}
+
+# Include the webhooks router
+app.include_router(webhooks_router, prefix="/webhooks", tags=["webhooks"])
+
+@app.get("/fetch-pull-requests/{owner}/{repo}")
+async def fetch_all_prs(owner: str, repo: str):
     """
-    Test endpoint to simulate a GitHub webhook call.
-    This is for debugging and testing purposes only.
-    """
-    # Create a mock GitHub push event payload
-    mock_payload = {
-        "repository": {
-            "full_name": "test-user/test-repo"
-        },
-        "pusher": {
-            "name": "test-user"
-        },
-        "ref": "refs/heads/main",
-        "commits": [
-            {
-                "id": "abc1234567890",
-                "message": "Test commit message",
-                "timestamp": "2023-10-25T12:00:00Z",
-                "url": "https://github.com/test-user/test-repo/commit/abc1234567890",
-                "author": {
-                    "name": "Test User",
-                    "email": "test@example.com"
-                },
-                "added": ["file1.txt"],
-                "modified": ["file2.txt"],
-                "removed": []
-            }
-        ]
-    }
+    Fetch all pull requests from a GitHub repository and save them to collective.json.
     
-    # Convert the payload to JSON
-    payload_bytes = json.dumps(mock_payload).encode('utf-8')
+    This endpoint fetches all pull requests for the specified repository,
+    formats them with fields: id, number, title, body, state, createdAt,
+    and saves them to a file called collective.json.
     
-    # Generate a valid signature using the secret
-    secret = settings.GITHUB_WEBHOOK_SECRET.encode()
-    signature = 'sha256=' + hmac.new(secret, payload_bytes, hashlib.sha256).hexdigest()
-    
-    print("\n===== TEST WEBHOOK CALL =====")
-    print(f"Generated signature: {signature}")
-    
-    # Create a fake request context to pass to the webhook handler
-    headers = {
-        "X-GitHub-Event": "push",
-        "X-Hub-Signature-256": signature,
-        "Content-Type": "application/json"
-    }
-    
-    # Call the webhook handler directly
-    try:
-        # Manually verify the signature first
-        if secret and signature:
-            print("✅ Secret and signature look valid")
+    Args:
+        owner: Repository owner/organization (e.g., "facebook")
+        repo: Repository name (e.g., "react")
         
-        # Call the service function directly with our test payload
-        print("Calling process_push_event with test payload...")
-        await process_push_event(mock_payload)
+    Returns:
+        Information about the fetched pull requests
+    """
+    print("Fetching pull requests...")
+    # if not os.environ.get("GITHUB_TOKEN"):
+    #     raise HTTPException(status_code=500, detail="GitHub token not configured")
+    
+    try:
+        # Fetch all PRs and save to collective.json
+        result = fetch_and_save_all_pull_requests(owner, repo)
+        
+        # Return information about the fetched data
         return {
-            "status": "success", 
-            "message": "Test webhook call simulated successfully"
+            "status": "success",
+            "repository": result["repository"],
+            "timestamp": result["timestamp"],
+            "count": result["count"],
+            "file": "collective.json",
+            "message": f"Successfully fetched and saved {result['count']} pull requests"
         }
     except Exception as e:
-        print(f"❌ Error testing webhook: {str(e)}")
-        return {"status": "error", "message": f"Error: {str(e)}"}
+        logger.error(f"Error fetching pull requests: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error fetching pull requests: {str(e)}")
 
 @app.get("/slack/thread/{channel_id}/{thread_ts}")
 async def get_thread_replies(channel_id: str, thread_ts: str):
@@ -351,7 +359,6 @@ async def sort_messages_by_thread():
         return {"status": "error", "message": str(e)}
 
 
-
 from pydantic import BaseModel
 
 class ChatQuery(BaseModel):
@@ -394,3 +401,6 @@ async def chat_endpoint_post(chat_query: ChatQuery):
             "query": chat_query.query if hasattr(chat_query, 'query') else "unknown",
             "message": f"Error processing query: {str(e)}"
         }
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

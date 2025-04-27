@@ -42,6 +42,8 @@ ehthumbs.db
 Thumbs.db
 
 # Project specific
+backend/.env
+backend/collective.json
 .env
 *.db
 *.sqlite3

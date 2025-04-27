@@ -1,0 +1,159 @@
+{
+  "repository": "MichaelPeng123/lahacks2025",
+  "timestamp": "2025-04-26T23:53:34.461959",
+  "count": 19,
+  "pull_requests": [
+    {
+      "id": "2484000082",
+      "number": 22,
+      "title": "LLM Rag functionality to read slack logs",
+      "body": null,
+      "state": "closed",
+      "createdAt": "2025-04-27T06:17:28Z"
+    },
+    {
+      "id": "2483888121",
+      "number": 21,
+      "title": "Mike/agentwork",
+      "body": "github side",
+      "state": "open",
+      "createdAt": "2025-04-27T04:22:21Z"
+    },
+    {
+      "id": "2483858921",
+      "number": 20,
+      "title": "Upgrade Rag",
+      "body": null,
+      "state": "closed",
+      "createdAt": "2025-04-27T04:01:20Z"
+    },
+    {
+      "id": "2483851228",
+      "number": 19,
+      "title": "Feat/rag endpoint",
+      "body": null,
+      "state": "closed",
+      "createdAt": "2025-04-27T03:56:05Z"
+    },
+    {
+      "id": "2483843666",
+      "number": 17,
+      "title": "Mock Frontend",
+      "body": "Mock frontend using components for code skeleton (NOT FINAL) also fix backend a little",
+      "state": "closed",
+      "createdAt": "2025-04-27T03:44:07Z"
+    },
+    {
+      "id": "2483818404",
+      "number": 16,
+      "title": "Mike/agentwork",
+      "body": "NEW PULL REQUEST!",
+      "state": "closed",
+      "createdAt": "2025-04-27T02:50:15Z"
+    },
+    {
+      "id": "2483814560",
+      "number": 15,
+      "title": "Mike/githubwebhook",
+      "body": null,
+      "state": "closed",
+      "createdAt": "2025-04-27T02:42:00Z"
+    },
+    {
+      "id": "2483812518",
+      "number": 14,
+      "title": "Mike/githubwebhook",
+      "body": null,
+      "state": "closed",
+      "createdAt": "2025-04-27T02:40:05Z"
+    },
+    {
+      "id": "2483804957",
+      "number": 13,
+      "title": "Mike/agentwork",
+      "body": null,
+      "state": "closed",
+      "createdAt": "2025-04-27T02:23:19Z"
+    },
+    {
+      "id": "2483738487",
+      "number": 12,
+      "title": "Mike/githubwebhook",
+      "body": null,
+      "state": "closed",
+      "createdAt": "2025-04-27T00:49:53Z"
+    },
+    {
+      "id": "2483727993",
+      "number": 11,
+      "title": "Slack frontend (interacitons)",
+      "body": "Proof of concept to link backend to frontend - not necessarily final",
+      "state": "closed",
+      "createdAt": "2025-04-27T00:30:29Z"
+    },
+    {
+      "id": "2483700816",
+      "number": 10,
+      "title": "Mike/githubwebhook",
+      "body": "test pr",
+      "state": "closed",
+      "createdAt": "2025-04-26T23:50:21Z"
+    },
+    {
+      "id": "2483700398",
+      "number": 9,
+      "title": "Neo4j",
+      "body": "Implemented the scaffolding and service for Neo4js and have mockdata for testing. \r\n\r\nAlso created sentence embeddings for vectorized semantic search. ",
+      "state": "closed",
+      "createdAt": "2025-04-26T23:48:52Z"
+    },
+    {
+      "id": "2483672430",
+      "number": 7,
+      "title": "Formatting JSON for Agent",
+      "body": "Formatting slack data for input into agent in the format\r\n<img width=\"562\" alt=\"image\" src=\"https://github.com/user-attachments/assets/29211d55-b9bf-4358-a309-acc8e99b572e\" />\r\n",
+      "state": "closed",
+      "createdAt": "2025-04-26T23:21:12Z"
+    },
+    {
+      "id": "2483633404",
+      "number": 6,
+      "title": "Mike/githubwebhook",
+      "body": "new pr",
+      "state": "closed",
+      "createdAt": "2025-04-26T22:45:50Z"
+    },
+    {
+      "id": "2483603204",
+      "number": 5,
+      "title": "Slack Monitoring",
+      "body": "Monitor slack through devatlas slack bot - only does hardcoded channels so far but when we need expanded functionality, it can automatically find channels it's added to and monitor them all\r\n\r\nDumps all the slack data into a data folder with a json folder after running \r\n\r\nTo test run\r\n`source venv/bin/activate`\r\n`PYTHONPATH=/Users/andrewwang/Documents/lahacks2025 python -m uvicorn main:app --reload`",
+      "state": "closed",
+      "createdAt": "2025-04-26T22:19:02Z"
+    },
+    {
+      "id": "2483553371",
+      "number": 3,
+      "title": "Mike/githubwebhook",
+      "body": "pls show up",
+      "state": "closed",
+      "createdAt": "2025-04-26T20:50:15Z"
+    },
+    {
+      "id": "2483547872",
+      "number": 2,
+      "title": "Mike/githubwebhook",
+      "body": "hello!",
+      "state": "closed",
+      "createdAt": "2025-04-26T20:35:00Z"
+    },
+    {
+      "id": "2483541071",
+      "number": 1,
+      "title": "added prs to git webhook",
+      "body": "pls merge this",
+      "state": "closed",
+      "createdAt": "2025-04-26T20:28:22Z"
+    }
+  ]
+}
