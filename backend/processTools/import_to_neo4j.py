@@ -84,6 +84,22 @@ def import_nodes(neo4j: Neo4jService, data: Dict[str, Any]) -> Dict[str, int]:
         
         success_count = 0
         for node in nodes:
+            # For User nodes, ensure slackId is preserved if it exists
+            if label == "User" and "slackId" in node:
+                logger.info(f"User {node.get('name', 'Unknown')} has slackId: {node['slackId']}")
+            
+            # Log when PullRequest nodes have authorLogin
+            if label == "PullRequest" and "authorLogin" in node:
+                logger.info(f"PullRequest #{node.get('number', 'Unknown')} has authorLogin: {node['authorLogin']}")
+            
+            # Log when Issue nodes have authorLogin
+            if label == "Issue" and "authorLogin" in node:
+                logger.info(f"Issue #{node.get('number', 'Unknown')} has authorLogin: {node['authorLogin']}")
+            
+            # Log when Message nodes have author information
+            if label == "Message" and "authorId" in node and "authorLogin" in node:
+                logger.info(f"Message {node.get('id', 'Unknown')} connected to author: {node['authorLogin']}")
+            
             if neo4j.create_node(label, node):
                 success_count += 1
         
@@ -188,7 +204,7 @@ def create_relationships(neo4j: Neo4jService, data: Dict[str, Any]) -> Dict[str,
         results[f"PullRequest-{rel_type}->Issue"] = success_count
         logger.info(f"Created {success_count} {rel_type} relationships")
     
-    # Import Slack Message author relationships
+    # Import Slack Message author relationships - now using authorId from the messages
     if "slackMessages" in data and "users" in data:
         rel_type = "AUTHORED"
         logger.info(f"Creating {rel_type} relationships for Slack Messages")
@@ -238,25 +254,36 @@ def create_relationships(neo4j: Neo4jService, data: Dict[str, Any]) -> Dict[str,
         if not args.include_all_messages:
             slack_messages = [msg for msg in slack_messages if not msg.get("text", "").endswith("has joined the channel")]
         
+        # Debug: Check how many messages have threadTs
+        thread_ts_count = sum(1 for msg in slack_messages if msg.get("threadTs"))
+        logger.info(f"Found {thread_ts_count} messages with threadTs field")
+        
         # Create a mapping of threadTs to message IDs
         thread_ts_to_id = {}
+        ts_to_id = {}
         for msg in slack_messages:
-            slack_id = msg.get("slackId")
-            if slack_id:
-                thread_ts_to_id[slack_id] = msg["id"]
+            # Map the message timestamp (in createdAt) to its ID
+            created_at = msg.get("createdAt")
+            if created_at:
+                # Convert to string format that matches threadTs
+                ts_value = created_at.replace('Z', '')
+                ts_to_id[ts_value] = msg["id"]
+                logger.info(f"Mapped timestamp {ts_value} to message ID {msg['id']}")
         
         success_count = 0
         for msg in slack_messages:
             thread_ts = msg.get("threadTs")
-            if thread_ts and thread_ts in thread_ts_to_id:
-                parent_id = thread_ts_to_id[thread_ts]
-                if neo4j.create_relationship("Message", msg["id"], "Message", parent_id, rel_type):
-                    success_count += 1
+            if thread_ts and thread_ts in ts_to_id:
+                parent_id = ts_to_id[thread_ts]
+                # Don't create a relationship to itself
+                if parent_id != msg["id"]:
+                    if neo4j.create_relationship("Message", msg["id"], "Message", parent_id, rel_type):
+                        success_count += 1
         
         results[f"Message-{rel_type}->Message"] = success_count
         logger.info(f"Created {success_count} {rel_type} relationships")
     
-    # Import Slack Message references to GitHub PRs and Issues
+    # Import Slack Message references to GitHub PRs and Issues - now using authorLogin to improve connections
     if "slackMessages" in data:
         rel_type = "REFERENCES_GITHUB"
         logger.info(f"Creating {rel_type} relationships for Slack Messages")
@@ -266,50 +293,151 @@ def create_relationships(neo4j: Neo4jService, data: Dict[str, Any]) -> Dict[str,
         if not args.include_all_messages:
             slack_messages = [msg for msg in slack_messages if not msg.get("text", "").endswith("has joined the channel")]
         
+        # Debug: Check how many messages have authorLogin
+        author_login_count = sum(1 for msg in slack_messages if msg.get("authorLogin"))
+        logger.info(f"Found {author_login_count} messages with authorLogin field")
+        
         pr_refs = 0
         issue_refs = 0
         
-        # Simplistic approach - in a real system you'd use regex and URL parsing
+        # Create a set of all PR numbers and their IDs for quicker lookup
+        pr_number_to_id = {}
+        if "pullRequests" in data:
+            for pr in data["pullRequests"]:
+                pr_number = pr.get("number")
+                if pr_number:
+                    pr_number_to_id[pr_number] = pr["id"]
+            logger.info(f"Indexed {len(pr_number_to_id)} PR numbers for reference matching")
+        
+        # Create a set of all issue numbers and their IDs for quicker lookup
+        issue_number_to_id = {}
+        if "issues" in data:
+            for issue in data["issues"]:
+                issue_number = issue.get("number")
+                if issue_number:
+                    issue_number_to_id[issue_number] = issue["id"]
+            logger.info(f"Indexed {len(issue_number_to_id)} issue numbers for reference matching")
+        
+        # Create a mapping of GitHub logins to PR and issue IDs
+        author_login_to_prs = {}
+        author_login_to_issues = {}
+        
+        if "pullRequests" in data:
+            for pr in data["pullRequests"]:
+                author_login = pr.get("authorLogin")
+                if author_login:
+                    if author_login not in author_login_to_prs:
+                        author_login_to_prs[author_login] = []
+                    author_login_to_prs[author_login].append(pr["id"])
+            
+            logger.info(f"Mapped {len(author_login_to_prs)} GitHub logins to their PRs")
+        
+        if "issues" in data:
+            for issue in data["issues"]:
+                author_login = issue.get("authorLogin")
+                if author_login:
+                    if author_login not in author_login_to_issues:
+                        author_login_to_issues[author_login] = []
+                    author_login_to_issues[author_login].append(issue["id"])
+            
+            logger.info(f"Mapped {len(author_login_to_issues)} GitHub logins to their issues")
+        
+        # Process each Slack message
         for msg in slack_messages:
             text = msg.get("text", "").lower()
+            author_login = msg.get("authorLogin")
             
-            # Check for PR references
-            if "pullRequests" in data:
-                for pr in data["pullRequests"]:
-                    pr_number = pr.get("number")
-                    if not pr_number:
-                        continue
+            # Skip messages without text
+            if not text or text == "":
+                continue
+            
+            # Check for PR references in text
+            for pr_number in pr_number_to_id:
+                # Check for common reference patterns
+                pr_patterns = [
+                    f"pr #{pr_number}",
+                    f"pr#{pr_number}",
+                    f"pr {pr_number}",
+                    f"pull request #{pr_number}",
+                    f"pull request {pr_number}",
+                    f"pull/{pr_number}",
+                    f"#{pr_number}"
+                ]
+                
+                if any(pattern in text for pattern in pr_patterns):
+                    pr_id = pr_number_to_id[pr_number]
+                    # Find the PR's author login for comparison
+                    pr_author = None
+                    for pr in data["pullRequests"]:
+                        if pr["id"] == pr_id:
+                            pr_author = pr.get("authorLogin")
+                            break
                     
-                    # Check for PR references in text
-                    pr_patterns = [
-                        f"pr #{pr_number}",
-                        f"pr#{pr_number}",
-                        f"pull request #{pr_number}",
-                        f"pull request {pr_number}"
-                    ]
+                    # Check if this PR was authored by the message author
+                    is_author_match = author_login and pr_author and author_login == pr_author
                     
-                    if any(pattern in text for pattern in pr_patterns) or f"pull/{pr_number}" in text:
-                        properties = {"referenceType": "mention"}
-                        if neo4j.create_relationship("Message", msg["id"], "PullRequest", pr["id"], rel_type, properties):
+                    properties = {
+                        "referenceType": "mention",
+                        "authorMatch": is_author_match
+                    }
+                    
+                    if neo4j.create_relationship("Message", msg["id"], "PullRequest", pr_id, rel_type, properties):
+                        pr_refs += 1
+                        logger.info(f"Created {rel_type} from message to PR #{pr_number}")
+            
+            # Check for Issue references in text
+            for issue_number in issue_number_to_id:
+                # Check for common reference patterns
+                issue_patterns = [
+                    f"issue #{issue_number}",
+                    f"issue#{issue_number}",
+                    f"issue {issue_number}",
+                    f"#{issue_number}",
+                    f"issues/{issue_number}"
+                ]
+                
+                if any(pattern in text for pattern in issue_patterns):
+                    issue_id = issue_number_to_id[issue_number]
+                    # Find the issue's author login for comparison
+                    issue_author = None
+                    for issue in data["issues"]:
+                        if issue["id"] == issue_id:
+                            issue_author = issue.get("authorLogin")
+                            break
+                    
+                    # Check if this issue was authored by the message author
+                    is_author_match = author_login and issue_author and author_login == issue_author
+                    
+                    properties = {
+                        "referenceType": "mention",
+                        "authorMatch": is_author_match
+                    }
+                    
+                    if neo4j.create_relationship("Message", msg["id"], "Issue", issue_id, rel_type, properties):
+                        issue_refs += 1
+                        logger.info(f"Created {rel_type} from message to Issue #{issue_number}")
+            
+            # If message has author login, also connect to all PRs/issues created by this author
+            if author_login:
+                # Connect to all PRs by this author
+                if author_login in author_login_to_prs:
+                    for pr_id in author_login_to_prs[author_login]:
+                        # Only create a relationship if not already mentioned explicitly
+                        properties = {
+                            "referenceType": "author_context",
+                            "authorMatch": True
+                        }
+                        if neo4j.create_relationship("Message", msg["id"], "PullRequest", pr_id, f"{rel_type}_BY_AUTHOR", properties):
                             pr_refs += 1
-            
-            # Check for Issue references
-            if "issues" in data:
-                for issue in data["issues"]:
-                    issue_number = issue.get("number")
-                    if not issue_number:
-                        continue
-                    
-                    # Check for Issue references in text
-                    issue_patterns = [
-                        f"issue #{issue_number}",
-                        f"issue#{issue_number}",
-                        f"#{issue_number}"
-                    ]
-                    
-                    if any(pattern in text for pattern in issue_patterns) or f"issues/{issue_number}" in text:
-                        properties = {"referenceType": "mention"}
-                        if neo4j.create_relationship("Message", msg["id"], "Issue", issue["id"], rel_type, properties):
+                
+                # Connect to all issues by this author
+                if author_login in author_login_to_issues:
+                    for issue_id in author_login_to_issues[author_login]:
+                        properties = {
+                            "referenceType": "author_context",
+                            "authorMatch": True
+                        }
+                        if neo4j.create_relationship("Message", msg["id"], "Issue", issue_id, f"{rel_type}_BY_AUTHOR", properties):
                             issue_refs += 1
         
         results[f"Message-{rel_type}->PullRequest"] = pr_refs

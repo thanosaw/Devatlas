@@ -42,3 +42,4 @@ slack-sdk>=3.26.1  # For Slack API integration
 pyngrok>=7.0.0  # For exposing local server to the internet
 
 neo4j-graphrag
+
