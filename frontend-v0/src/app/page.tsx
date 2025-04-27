@@ -4,7 +4,7 @@ import { useState, useRef, FormEvent, ChangeEvent, useEffect } from "react";
 import Image from "next/image";
 import { fetchAllDevelopers } from "@/lib/api";
 import DeveloperCard from "@/components/DeveloperCard";
-import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
+import ReactMarkdown from 'react-markdown';
 
 interface Message {
   text: string;
@@ -185,6 +185,7 @@ export default function Home() {
         setMessages(prev => [...prev, { 
           text: data.answer || "Sorry, I couldn't process that.", 
           isUser: false,
+          isTyping: true, // Set typing flag to true initially
           metadata: data.metadata,
           detectedDevelopers: detectedDevs
         }]);
@@ -192,6 +193,7 @@ export default function Home() {
         setMessages(prev => [...prev, { 
           text: "Sorry, I couldn't process that request.", 
           isUser: false,
+          isTyping: true,
           metadata: { model: selectedModel }
         }]);
       }
@@ -208,6 +210,7 @@ export default function Home() {
       setMessages(prev => [...prev, { 
         text: errorMessage,
         isUser: false,
+        isTyping: true,
         metadata: { model: selectedModel }
       }]);
     } finally {
@@ -388,20 +391,16 @@ export default function Home() {
                         maxWidth: "80%"
                       } : {
                         padding: "20px 0",
-                        maxWidth: "80%",
-                        width: "100%" // Ensure full width for the TextGenerateEffect
+                        maxWidth: "80%"
                       }
                     }
                   >
                     {message.isUser ? (
                       message.text
                     ) : (
-                      <TextGenerateEffect 
-                        words={message.text} 
-                        duration={1.5}
-                        filter={false}
-                        className="text-base font-normal"
-                      />
+                      <ReactMarkdown className="whitespace-pre-line">
+                        {message.text}
+                      </ReactMarkdown>
                     )}
                     {message.metadata && (
                       <div className="mt-2 text-sm opacity-70">

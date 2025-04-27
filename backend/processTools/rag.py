@@ -39,6 +39,9 @@ class As1LLM(LLMInterface):
             3. If providing technical information, highlight key technical terms.
             4. If uncertain about any part of the answer, clearly indicate what's uncertain.
             5. Keep your answer focused and avoid tangential information.
+            6. When referring to a user, ALWAYS use their Github login name (not numeric IDs).
+            7. If you see a numeric user ID in the context, check if there's an associated login or id field and use that instead.
+            8. Format GitHub usernames with @ symbol (e.g., @username) to make them stand out.
             
             Your tone should be professional, clear, and factual.
             """

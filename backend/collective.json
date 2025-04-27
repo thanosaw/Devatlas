@@ -29,6 +29,26 @@
   ],
   "pullRequests": [
     {
+      "id": "2484131608",
+      "number": 30,
+      "title": "Mike/scriptfix",
+      "body": "final script for backend integration",
+      "state": "closed",
+      "createdAt": "2025-04-27T09:50:35Z",
+      "authorId": "user-32288183",
+      "repositoryId": "repo-MichaelPeng123-lahacks2025"
+    },
+    {
+      "id": "2484122690",
+      "number": 29,
+      "title": "Hotifx",
+      "body": null,
+      "state": "closed",
+      "createdAt": "2025-04-27T09:29:35Z",
+      "authorId": "user-56616222",
+      "repositoryId": "repo-MichaelPeng123-lahacks2025"
+    },
+    {
       "id": "2484058143",
       "number": 26,
       "title": "integrated github fetching with mock data",
@@ -43,7 +63,7 @@
       "number": 24,
       "title": "Mike/agentwork",
       "body": "yo",
-      "state": "open",
+      "state": "closed",
       "createdAt": "2025-04-27T07:21:03Z",
       "authorId": "user-32288183",
       "repositoryId": "repo-MichaelPeng123-lahacks2025"
@@ -247,16 +267,6 @@
       "createdAt": "2025-04-26T20:28:22Z",
       "authorId": "user-32288183",
       "repositoryId": "repo-MichaelPeng123-lahacks2025"
-    },
-    {
-      "id": "2484047221",
-      "number": 24,
-      "title": "Mike/agentwork",
-      "body": "yo",
-      "state": "closed",
-      "createdAt": "2025-04-27T07:21:03Z",
-      "authorId": "user-32288183",
-      "repositoryId": "repo-973000550"
     }
   ],
   "issues": [

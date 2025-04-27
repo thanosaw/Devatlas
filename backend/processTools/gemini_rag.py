@@ -37,6 +37,22 @@ class GeminiHttpLLM(LLMInterface):
         contents = []
         
         # Add system message if provided
+        if system_instruction is None:
+            system_instruction = """
+            You are an AI assistant with access to a knowledge graph about developers and their contributions.
+            
+            Please follow these guidelines:
+            1. Answer directly and concisely based on the retrieved context
+            2. If the retrieved context doesn't contain relevant information, acknowledge the limitations
+            3. Format technical information clearly and highlight key terms
+            4. Maintain a professional, factual tone
+            5. Only discuss information that appears in the retrieved content
+            6. When referring to a user, ALWAYS use their Github login name (not numeric IDs)
+            7. If you see a numeric user ID in the context, check if there's an associated login or id field and use that instead
+            8. Format GitHub usernames with @ symbol (e.g., @username) to make them stand out
+            9. Be precise about which developer did what action
+            """
+        
         if system_instruction:
             contents.append({
                 "role": "user",
@@ -286,7 +302,7 @@ print("\nInitializing sentence transformer embedder...")
 embedder = SentenceTransformerEmbeddings(model="all-MiniLM-L6-v2")
 
 # Query the graph function
-def query_rag(query_text, top_k=15, capture_debug=None):
+def query_rag(query_text, top_k=500, capture_debug=None):
     """
     Query the graph using RAG and return the answer with metadata.
     
@@ -352,6 +368,7 @@ def query_rag(query_text, top_k=15, capture_debug=None):
         3. Format technical information clearly and highlight key terms
         4. Maintain a professional, factual tone
         5. Only discuss information that appears in the retrieved content
+        6. When referring to a user use their github login
         """
         
         # Execute the query

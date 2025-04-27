@@ -13,6 +13,7 @@ import os
 from typing import List, Dict, Any, Optional
 from dotenv import load_dotenv
 
+from backend.services.github_fetch import fetch_and_save_all_github_data
 
 
 # Import processing tools
@@ -70,7 +71,7 @@ def ensure_process_directories():
     
     # Define file paths that need to exist
     required_files = {
-        'backend/processTools/mock.json': 'processTools/mock.json',
+        'processTools/mock.json': 'processTools/mock.json',
         'processTools/mock.json': None,  # Create empty if doesn't exist
     }
     
@@ -195,6 +196,7 @@ async def startup_event():
     # Process all nodes and import data to Neo4j
     try:
         print("Running process_all_nodes to update embeddings...")
+        fetch_and_save_all_github_data("MichaelPeng123", "lahacks2025")
         run_process_all_nodes()
         print("✅ Successfully processed all nodes and added embeddings")
         
@@ -505,7 +507,7 @@ async def gemini_chat_endpoint_post(chat_query: ChatQuery):
         
         # Call the Gemini RAG system with the query
         # Using top_k=15 for better coverage of large datasets
-        answer, node_type, reason = gemini_query_rag(query, top_k=15, capture_debug=debug_info)
+        answer, node_type, reason = gemini_query_rag(query, top_k=500, capture_debug=debug_info)
         
         return {
             "status": "success",
