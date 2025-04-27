@@ -29,6 +29,16 @@
   ],
   "pullRequests": [
     {
+      "id": "2484122690",
+      "number": 29,
+      "title": "Hotifx",
+      "body": null,
+      "state": "closed",
+      "createdAt": "2025-04-27T09:29:35Z",
+      "authorId": "user-56616222",
+      "repositoryId": "repo-MichaelPeng123-lahacks2025"
+    },
+    {
       "id": "2484058143",
       "number": 26,
       "title": "integrated github fetching with mock data",
@@ -43,7 +53,7 @@
       "number": 24,
       "title": "Mike/agentwork",
       "body": "yo",
-      "state": "open",
+      "state": "closed",
       "createdAt": "2025-04-27T07:21:03Z",
       "authorId": "user-32288183",
       "repositoryId": "repo-MichaelPeng123-lahacks2025"
@@ -871,36 +881,5 @@
       "createdAt": "2025-04-26T13:02:33.641Z"
     }
   ],
-  "textChunks": [
-    {
-      "id": "chunk-1",
-      "sourceId": "pr-1",
-      "sourceType": "PullRequest",
-      "content": "This PR adds OAuth2 integration with Google and GitHub providers. It includes new API endpoints for authentication flow and updates to the user model to store OAuth tokens."
-    },
-    {
-      "id": "chunk-2",
-      "sourceId": "pr-1",
-      "sourceType": "PullRequest",
-      "content": "Related to #28 and fixes #15."
-    },
-    {
-      "id": "chunk-3",
-      "sourceId": "issue-1",
-      "sourceType": "Issue",
-      "content": "We need to implement OAuth2 authentication to support Google and GitHub login. This should include: OAuth2 client setup, Login flow, Token storage, User profile syncing"
-    },
-    {
-      "id": "chunk-4",
-      "sourceId": "message-1",
-      "sourceType": "SlackMessage",
-      "content": "I just opened PR #42 to add OAuth integration: https://github.com/acme/user-service/pull/42"
-    },
-    {
-      "id": "chunk-5",
-      "sourceId": "message-4",
-      "sourceType": "SlackMessage",
-      "content": "@taylor-eng I'm working on the OAuth PR (#42). Could you look at my approach for storing the tokens? Not sure if we should encrypt them or just hash them."
-    }
-  ]
+  "textChunks": []
 }

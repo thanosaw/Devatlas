@@ -13,6 +13,7 @@ import os
 from typing import List, Dict, Any, Optional
 from dotenv import load_dotenv
 
+from backend.services.github_fetch import fetch_and_save_all_github_data
 
 
 # Import processing tools
@@ -69,7 +70,7 @@ def ensure_process_directories():
     
     # Define file paths that need to exist
     required_files = {
-        'backend/processTools/mock.json': 'processTools/mock.json',
+        'processTools/mock.json': 'processTools/mock.json',
         'processTools/mock.json': None,  # Create empty if doesn't exist
     }
     
@@ -194,6 +195,7 @@ async def startup_event():
     # Process all nodes and import data to Neo4j
     try:
         print("Running process_all_nodes to update embeddings...")
+        fetch_and_save_all_github_data("MichaelPeng123", "lahacks2025")
         run_process_all_nodes()
         print("✅ Successfully processed all nodes and added embeddings")
         
