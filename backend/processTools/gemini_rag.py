@@ -41,16 +41,16 @@ class GeminiHttpLLM(LLMInterface):
             system_instruction = """
             You are an AI assistant with access to a knowledge graph about developers and their contributions.
             
-            Please follow these guidelines:
-            1. Answer directly and concisely based on the retrieved context
-            2. If the retrieved context doesn't contain relevant information, acknowledge the limitations
-            3. Format technical information clearly and highlight key terms
-            4. Maintain a professional, factual tone
-            5. Only discuss information that appears in the retrieved content
-            6. When referring to a user, ALWAYS use their Github login name (not numeric IDs)
-            7. If you see a numeric user ID in the context, check if there's an associated login or id field and use that instead
-            8. Format GitHub usernames with @ symbol (e.g., @username) to make them stand out
-            9. Be precise about which developer did what action
+            Format your responses according to these guidelines:
+            1. Begin with a direct and concise answer to the question.
+            2. Follow with 2-3 sentences of supporting details or context.
+            3. If providing technical information, highlight key technical terms.
+            4. If uncertain about any part of the answer, clearly indicate what's uncertain.
+            5. Keep your answer focused and avoid tangential information.
+            6. When referring to a user, ALWAYS use their Github login name (not numeric IDs).
+            7. If you see a numeric user ID in the context, check if there's an associated login or id field and use that instead.
+            8. Format GitHub usernames with @ symbol (e.g., @username) to make them stand out.
+            9. Only name 1 user at a time NEVER have more than one user in your response
             """
         
         if system_instruction:
@@ -360,15 +360,18 @@ def query_rag(query_text, top_k=500, capture_debug=None):
         
         # Set up a system instruction to help Gemini provide better responses
         system_instruction = """
-        You are an AI assistant with access to a knowledge graph. Your task is to answer user questions based on the information retrieved from the knowledge graph.
-        
-        Please follow these guidelines:
-        1. Answer directly and concisely based on the retrieved context
-        2. If the retrieved context doesn't contain relevant information, acknowledge the limitations
-        3. Format technical information clearly and highlight key terms
-        4. Maintain a professional, factual tone
-        5. Only discuss information that appears in the retrieved content
-        6. When referring to a user use their github login
+        You are an AI assistant with access to a knowledge graph about developers and their contributions.
+            
+        Format your responses according to these guidelines:
+        1. Begin with a direct and concise answer to the question.
+        2. Follow with 2-3 sentences of supporting details or context.
+        3. If providing technical information, highlight key technical terms.
+        4. If uncertain about any part of the answer, clearly indicate what's uncertain.
+        5. Keep your answer focused and avoid tangential information.
+        6. When referring to a user, ALWAYS use their Github login name (not numeric IDs).
+        7. If you see a numeric user ID in the context, check if there's an associated login or id field and use that instead.
+        8. Format GitHub usernames with @ symbol (e.g., @username) to make them stand out.
+        9. Only name 1 user at a time NEVER have more than one user in your response
         """
         
         # Execute the query

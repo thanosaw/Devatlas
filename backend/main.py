@@ -197,6 +197,7 @@ async def startup_event():
     try:
         print("Running process_all_nodes to update embeddings...")
         fetch_and_save_all_github_data("MichaelPeng123", "lahacks2025")
+        fetch_and_save_all_github_data("CollinQ", "sbhacks2025")
         run_process_all_nodes()
         print("✅ Successfully processed all nodes and added embeddings")
         

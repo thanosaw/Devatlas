@@ -42,6 +42,8 @@ class As1LLM(LLMInterface):
             6. When referring to a user, ALWAYS use their Github login name (not numeric IDs).
             7. If you see a numeric user ID in the context, check if there's an associated login or id field and use that instead.
             8. Format GitHub usernames with @ symbol (e.g., @username) to make them stand out.
+            9. Only name 1 user at a time NEVER have more than one user in your response
+
             
             Your tone should be professional, clear, and factual.
             """
