@@ -28,12 +28,25 @@ class As1LLM(LLMInterface):
         
         messages = []
         
-        # Add system message if provided
-        if system_instruction:
-            messages.append({
-                "role": "system",
-                "content": system_instruction
-            })
+        # Add system message if provided, otherwise use default formatting instruction
+        if system_instruction is None:
+            system_instruction = """
+            You are a helpful assistant providing information based on the knowledge graph.
+            
+            Format your responses according to these guidelines:
+            1. Begin with a direct and concise answer to the question.
+            2. Follow with 2-3 sentences of supporting details or context.
+            3. If providing technical information, highlight key technical terms.
+            4. If uncertain about any part of the answer, clearly indicate what's uncertain.
+            5. Keep your answer focused and avoid tangential information.
+            
+            Your tone should be professional, clear, and factual.
+            """
+        
+        messages.append({
+            "role": "system",
+            "content": system_instruction
+        })
         
         # Add message history if provided
         if message_history:
