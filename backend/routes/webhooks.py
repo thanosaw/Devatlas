@@ -5,11 +5,14 @@ import hashlib
 import json
 import os
 from typing import Optional
-from backend.services.github_service import process_push_event, process_pull_request_event
 from backend.services.github_processor import GitHubProcessor
 from backend.config import settings
+from uagents import Context
 
 router = APIRouter()
+
+import logging
+logging.basicConfig(level=logging.INFO)
 
 @router.post("/github-debug")
 async def github_webhook_debug(request: Request):
@@ -58,55 +61,16 @@ async def verify_github_signature(request: Request, x_hub_signature_256: Optiona
 async def github_webhook(request: Request, payload_body: bytes = Depends(verify_github_signature)):
     """Endpoint to receive GitHub webhook events."""
     
-    print("\n============ WEBHOOK RECEIVED ============")
-    print(f"Headers: {dict(request.headers)}")
-    
     # Get the event type from headers
     github_event = request.headers.get("X-GitHub-Event")
-    print(f"Event Type: {github_event}")
     
     # Parse JSON payload
     payload = json.loads(payload_body)
     
-    # Debug: Log full payload for troubleshooting
-    print("\n=== FULL PAYLOAD ===")
-    print(json.dumps(payload, indent=2)[:1000] + "..." if len(json.dumps(payload)) > 1000 else json.dumps(payload, indent=2))
-    
-    # Process with the GitHub processor and save to actions.txt
+    # Process with the GitHub processor - using original for compatibility
     processed_entities = GitHubProcessor.process_webhook(github_event, payload)
     entities_count = len(processed_entities)
     
-    # Handle different event types with original behavior for compatibility
-    if github_event == "push":
-        print(f"Repository: {payload.get('repository', {}).get('full_name', 'unknown')}")
-        print(f"Commits: {len(payload.get('commits', []))}")
-        
-        # Process the push event
-        await process_push_event(payload)
-        
-        print("✅ Push event successfully processed")
-        
-    elif github_event == "pull_request":
-        print(f"Repository: {payload.get('repository', {}).get('full_name', 'unknown')}")
-        print(f"PR Number: {payload.get('number', 'unknown')}")
-        print(f"Action: {payload.get('action', 'unknown')}")
-        
-        # Process the pull request event
-        await process_pull_request_event(payload)
-        
-        print("✅ Pull request event successfully processed")
-    
-    elif github_event in ["issues", "issue_comment", "discussion", "discussion_comment", "label", 
-                         "pull_request_review", "pull_request_review_comment"]:
-        print(f"Repository: {payload.get('repository', {}).get('full_name', 'unknown')}")
-        print(f"Action: {payload.get('action', 'unknown')}")
-        
-        print(f"✅ {github_event.replace('_', ' ').title()} event successfully processed")
-    
-    else:
-        # Return a 200 response for any other events we're not handling yet
-        print(f"⚠️ Ignoring event type: {github_event}")
-        return {"status": "ignored", "message": f"Event {github_event} ignored"}
     
     # Return success with entity count
     return {
@@ -114,3 +78,7 @@ async def github_webhook(request: Request, payload_body: bytes = Depends(verify_
         "message": f"{github_event} event processed",
         "entities_processed": entities_count
     }
+
+
+
+

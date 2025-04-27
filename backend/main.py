@@ -3,162 +3,37 @@
 # app = FastAPI()
 # app.include_router(webhooks.router, prefix="/webhooks", tags=["webhooks"])
 
-from fastapi import FastAPI, Request, Response, Header, Depends
-import json
-import hmac
-import hashlib
-from typing import Optional
-from backend.routes import webhooks
-from backend.config import settings
-from backend.services.github_service import process_push_event, process_pull_request_event
+from fastapi import FastAPI, Request
+import logging
+import uvicorn
+from backend.routes.webhooks import router as webhooks_router
 from backend.services.github_processor import GitHubProcessor
+from backend.config import settings
 
-app = FastAPI()
-app.include_router(webhooks.router, prefix="/webhooks", tags=["webhooks"])
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+app = FastAPI(title="LA Hacks 2025 Webhook Handler")
 
 @app.on_event("startup")
 async def startup_event():
-    print("server started")
-    print(f"Webhook route available at: /webhooks/github")
-    print(f"Processed GitHub webhooks will be saved to: {GitHubProcessor.ACTIONS_FILE}")
-    print("Supported webhook events:")
-    print("  - push (including merges)")
-    print("  - pull_request")
-    print("  - pull_request_review")
-    print("  - pull_request_review_comment")
-    print("  - issues")
-    print("  - issue_comment")
-    print("  - discussion")
-    print("  - discussion_comment")
-    print("  - label")
+    """Startup event handler."""
+    logger.info("Server started")
+    logger.info(f"Actions file path: {settings.ACTIONS_FILE_PATH}")
+    logger.info("Supported webhook events: pull_request, issues, issue_comment, pull_request_review, "
+                "pull_request_review_comment, discussion, discussion_comment, label, push")
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to Ownership AI API"}
+    """Root endpoint - API health check."""
+    return {"status": "ok", "message": "GitHub webhook handler is running"}
 
-@app.get("/test-webhook")
-async def test_webhook_manually():
-    """
-    Test endpoint to simulate a GitHub webhook call.
-    This is for debugging and testing purposes only.
-    """
-    # Create a mock GitHub push event payload
-    mock_payload = {
-        "repository": {
-            "full_name": "test-user/test-repo"
-        },
-        "pusher": {
-            "name": "test-user"
-        },
-        "ref": "refs/heads/main",
-        "commits": [
-            {
-                "id": "abc1234567890",
-                "message": "Test commit message",
-                "timestamp": "2023-10-25T12:00:00Z",
-                "url": "https://github.com/test-user/test-repo/commit/abc1234567890",
-                "author": {
-                    "name": "Test User",
-                    "email": "test@example.com"
-                },
-                "added": ["file1.txt"],
-                "modified": ["file2.txt"],
-                "removed": []
-            }
-        ]
-    }
-    
-    # Convert the payload to JSON
-    payload_bytes = json.dumps(mock_payload).encode('utf-8')
-    
-    # Generate a valid signature using the secret
-    secret = settings.GITHUB_WEBHOOK_SECRET.encode()
-    signature = 'sha256=' + hmac.new(secret, payload_bytes, hashlib.sha256).hexdigest()
-    
-    print("\n===== TEST WEBHOOK CALL =====")
-    print(f"Generated signature: {signature}")
-    
-    # Create a fake request context to pass to the webhook handler
-    headers = {
-        "X-GitHub-Event": "push",
-        "X-Hub-Signature-256": signature,
-        "Content-Type": "application/json"
-    }
-    
-    # Call the webhook handler directly
-    try:
-        # Manually verify the signature first
-        if secret and signature:
-            print("✅ Secret and signature look valid")
-        
-        # Call the service function directly with our test payload
-        print("Calling process_push_event with test payload...")
-        await process_push_event(mock_payload)
-        return {
-            "status": "success", 
-            "message": "Test webhook call simulated successfully"
-        }
-    except Exception as e:
-        print(f"❌ Error testing webhook: {str(e)}")
-        return {"status": "error", "message": f"Error: {str(e)}"}
+# Include the webhooks router
+app.include_router(webhooks_router, prefix="/webhooks", tags=["webhooks"])
 
-@app.get("/test-pr-webhook")
-async def test_pr_webhook_manually():
-    """
-    Test endpoint to simulate a GitHub pull request webhook call.
-    This is for debugging and testing purposes only.
-    """
-    # Create a mock GitHub PR event payload
-    mock_payload = {
-        "action": "opened",  # opened, closed, reopened, synchronize, etc.
-        "number": 123,
-        "pull_request": {
-            "title": "Test Pull Request",
-            "body": "This is a test PR description.\nWith multiple lines.",
-            "html_url": "https://github.com/test-user/test-repo/pull/123",
-            "user": {
-                "login": "test-user"
-            },
-            "head": {
-                "ref": "feature-branch"
-            },
-            "base": {
-                "ref": "main"
-            },
-            "merged": False,
-            "requested_reviewers": [
-                {
-                    "login": "reviewer1"
-                },
-                {
-                    "login": "reviewer2"
-                }
-            ]
-        },
-        "repository": {
-            "full_name": "test-user/test-repo"
-        }
-    }
-    
-    # Convert the payload to JSON
-    payload_bytes = json.dumps(mock_payload).encode('utf-8')
-    
-    # Generate a valid signature using the secret
-    secret = settings.GITHUB_WEBHOOK_SECRET.encode()
-    signature = 'sha256=' + hmac.new(secret, payload_bytes, hashlib.sha256).hexdigest()
-    
-    print("\n===== TEST PR WEBHOOK CALL =====")
-    print(f"Generated signature: {signature}")
-    
-    # Call the service function directly
-    try:
-        print("Calling process_pull_request_event with test payload...")
-        await process_pull_request_event(mock_payload)
-        return {
-            "status": "success", 
-            "message": "Test PR webhook call simulated successfully",
-            "pr_action": mock_payload["action"]
-        }
-    except Exception as e:
-        print(f"❌ Error testing PR webhook: {str(e)}")
-        return {"status": "error", "message": f"Error: {str(e)}"}
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
