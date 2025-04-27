@@ -10,7 +10,7 @@ from typing import Dict, Any, List
 from embedding_service import EmbeddingService
 from update_mock_data import update_mock_with_slack_data, update_mock_with_github_data
 
-from backend.services.github_fetch import (
+from github_fetch import (
     fetch_and_save_all_pull_requests, 
     fetch_and_save_all_issues, 
     fetch_and_save_all_pr_and_issues,
