@@ -20,10 +20,15 @@ class Settings(BaseSettings):
 
     # Database settings
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./test.db")
+    
+    # Agent settings
+    agent_seed: str = os.getenv("agent_seed", "")
+    agent_address: str = os.getenv("agent_address", "")
 
     class Config:
         """Pydantic config"""
         env_file = ".env"
+        extra = "ignore"  # Ignore extra fields to prevent validation errors
 
 settings = Settings()
 

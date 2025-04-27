@@ -5,7 +5,7 @@ export default function SlacksPage() {
     <div className="py-8 px-4">
       <header className="mb-8">
         <h1 className="text-3xl font-bold">Slack Monitoring Dashboard</h1>
-        <p className="text-gray-600">View and monitor Slack messages from your channels</p>
+        <p className="text-white">View and monitor Slack messages from your channels</p>
       </header>
       
       <main>
