@@ -1,0 +1,675 @@
+{
+  "users": [
+    {
+      "id": "user-1",
+      "githubLogin": "sarah-dev",
+      "slackId": "U01234ABC",
+      "name": "Sarah Johnson",
+      "email": "sarah@example.com"
+    },
+    {
+      "id": "user-2",
+      "githubLogin": "alex-coder",
+      "slackId": "U02345BCD",
+      "name": "Alex Rodriguez",
+      "email": "alex@example.com"
+    },
+    {
+      "id": "user-3",
+      "githubLogin": "taylor-eng",
+      "slackId": "U03456CDE",
+      "name": "Taylor Smith",
+      "email": "taylor@example.com"
+    },
+    {
+      "id": "user-4",
+      "githubLogin": "jamie-qa",
+      "slackId": "U04567DEF",
+      "name": "Jamie Wilson",
+      "email": "jamie@example.com"
+    },
+    {
+      "id": "user-5",
+      "githubLogin": "morgan-devops",
+      "slackId": "U05678EFG",
+      "name": "Morgan Lee",
+      "email": "morgan@example.com"
+    }
+  ],
+  "repositories": [
+    {
+      "id": "repo-1",
+      "name": "user-service",
+      "fullName": "acme/user-service",
+      "description": "Microservice for user authentication and management"
+    },
+    {
+      "id": "repo-2",
+      "name": "payment-gateway",
+      "fullName": "acme/payment-gateway",
+      "description": "Payment processing service with support for multiple providers"
+    }
+  ],
+  "pullRequests": [
+    {
+      "id": "pr-1",
+      "number": 42,
+      "title": "Add OAuth2 integration",
+      "body": "This PR adds OAuth2 integration with Google and GitHub providers. It includes new API endpoints for authentication flow and updates to the user model to store OAuth tokens.\n\nRelated to #28 and fixes #15.",
+      "state": "open",
+      "createdAt": "2023-04-10T09:15:00Z",
+      "authorId": "user-1",
+      "repositoryId": "repo-1"
+    },
+    {
+      "id": "pr-2",
+      "number": 43,
+      "title": "Update user profile endpoints",
+      "body": "Refactors the user profile API endpoints to support the new OAuth providers. Adds missing fields and validation for profile updates.",
+      "state": "open",
+      "createdAt": "2023-04-12T14:30:00Z",
+      "authorId": "user-3",
+      "repositoryId": "repo-1"
+    },
+    {
+      "id": "pr-3",
+      "number": 67,
+      "title": "Add Stripe payment processor",
+      "body": "Implements Stripe as a payment processor option with support for credit cards, ACH, and international payments. Includes webhook handling for payment events.",
+      "state": "merged",
+      "createdAt": "2023-04-05T10:20:00Z",
+      "authorId": "user-2",
+      "repositoryId": "repo-2"
+    }
+  ],
+  "issues": [
+    {
+      "id": "issue-1",
+      "number": 15,
+      "title": "Implement OAuth2 authentication",
+      "body": "We need to implement OAuth2 authentication to support Google and GitHub login. This should include:\n\n- OAuth2 client setup\n- Login flow\n- Token storage\n- User profile syncing",
+      "state": "closed",
+      "createdAt": "2023-03-25T10:00:00Z",
+      "authorId": "user-2",
+      "repositoryId": "repo-1"
+    },
+    {
+      "id": "issue-2",
+      "number": 28,
+      "title": "User profile doesn't show OAuth linked accounts",
+      "body": "Currently when a user links their account with OAuth providers, this information isn't displayed in their profile settings.",
+      "state": "open",
+      "createdAt": "2023-04-05T16:45:00Z",
+      "authorId": "user-4",
+      "repositoryId": "repo-1"
+    },
+    {
+      "id": "issue-3",
+      "number": 54,
+      "title": "Add support for multiple payment providers",
+      "body": "We need to support multiple payment providers including:\n\n- Stripe\n- PayPal\n- Square\n\nEach provider should have a consistent interface.",
+      "state": "open",
+      "createdAt": "2023-03-20T11:15:00Z",
+      "authorId": "user-5",
+      "repositoryId": "repo-2"
+    }
+  ],
+  "slackChannels": [
+    {
+      "id": "ee498b2d-6f26-464c-ba8a-700b3c0da43f",
+      "slackId": "C08PYHJ2B3N",
+      "name": "all-devatlas",
+      "isPrivate": false
+    },
+    {
+      "id": "fa51aa4c-1094-4ccf-bb60-ce3a531a5a2d",
+      "slackId": "C08PLFR675L",
+      "name": "project-lahacks",
+      "isPrivate": false
+    },
+    {
+      "id": "1ee66ce0-72d3-4b2d-9d21-45c685dd28ab",
+      "slackId": "C08PYHJ3ANQ",
+      "name": "social",
+      "isPrivate": false
+    }
+  ],
+  "slackMessages": [
+    {
+      "id": "f51d2ddd-198e-4e62-b9a8-1edcb5b7c180",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ2B3N",
+      "text": "@uswangandrew has joined the channel",
+      "threadTs": null,
+      "createdAt": "2025-04-26T12:52:47.014Z"
+    },
+    {
+      "id": "087c2384-18ee-413d-b622-bc29ebe7bc6d",
+      "slackId": "U08PYHHT9E0",
+      "channelId": "C08PYHJ2B3N",
+      "text": "<@U08PYHHT9E0> has joined the channel",
+      "threadTs": null,
+      "createdAt": "2025-04-26T12:52:47.014Z"
+    },
+    {
+      "id": "430c37ee-f73f-4bd9-b80e-8727fb88e3b9",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ3ANQ",
+      "text": "@uswangandrew has joined the channel",
+      "threadTs": null,
+      "createdAt": "2025-04-26T12:52:47.249Z"
+    },
+    {
+      "id": "972eee5b-2386-4b44-8efe-d34225525992",
+      "slackId": "michellefeng153",
+      "channelId": "C08PYHJ2B3N",
+      "text": "@michellefeng153 has joined the channel",
+      "threadTs": null,
+      "createdAt": "2025-04-26T13:01:33.304Z"
+    },
+    {
+      "id": "6350576c-c9be-475e-b576-b64221aa13dc",
+      "slackId": "U08Q6RZCK25",
+      "channelId": "C08PYHJ2B3N",
+      "text": "<@U08Q6RZCK25> has joined the channel",
+      "threadTs": null,
+      "createdAt": "2025-04-26T13:01:33.304Z"
+    },
+    {
+      "id": "766f02d9-23ce-433c-98f8-5cfc175b849e",
+      "slackId": "michellefeng153",
+      "channelId": "C08PYHJ3ANQ",
+      "text": "@michellefeng153 has joined the channel",
+      "threadTs": null,
+      "createdAt": "2025-04-26T13:01:33.389Z"
+    },
+    {
+      "id": "fa2d2051-15f6-4d84-a6ea-829fe008ed11",
+      "slackId": "michael123.peng",
+      "channelId": "C08PYHJ2B3N",
+      "text": "@michael123.peng has joined the channel",
+      "threadTs": null,
+      "createdAt": "2025-04-26T13:01:47.023Z"
+    },
+    {
+      "id": "d81345be-06b2-41b2-8b16-21715425dde0",
+      "slackId": "U08PYHX1ML4",
+      "channelId": "C08PYHJ2B3N",
+      "text": "<@U08PYHX1ML4> has joined the channel",
+      "threadTs": null,
+      "createdAt": "2025-04-26T13:01:47.023Z"
+    },
+    {
+      "id": "4a016a07-7634-4550-9501-2a00f5703baa",
+      "slackId": "michael123.peng",
+      "channelId": "C08PYHJ3ANQ",
+      "text": "@michael123.peng has joined the channel",
+      "threadTs": null,
+      "createdAt": "2025-04-26T13:01:47.103Z"
+    },
+    {
+      "id": "96120347-5a88-4f13-8ab7-73b6a9c1d2fc",
+      "slackId": "hyunkim03",
+      "channelId": "C08PYHJ2B3N",
+      "text": "@hyunkim03 has joined the channel",
+      "threadTs": null,
+      "createdAt": "2025-04-26T13:01:47.692Z"
+    },
+    {
+      "id": "98736846-b4b3-4cc4-ab05-715e5529f7f4",
+      "slackId": "U08PDMK2CFR",
+      "channelId": "C08PYHJ2B3N",
+      "text": "<@U08PDMK2CFR> has joined the channel",
+      "threadTs": null,
+      "createdAt": "2025-04-26T13:01:47.692Z"
+    },
+    {
+      "id": "272d4c58-23e0-409d-bcb7-e8a3b45b9f46",
+      "slackId": "hyunkim03",
+      "channelId": "C08PYHJ3ANQ",
+      "text": "@hyunkim03 has joined the channel",
+      "threadTs": null,
+      "createdAt": "2025-04-26T13:01:47.712Z"
+    },
+    {
+      "id": "d187cde1-164a-44b6-a527-5f8681b2176c",
+      "slackId": "uswangandrew",
+      "channelId": "C08PLFR675L",
+      "text": "@uswangandrew has joined the channel",
+      "threadTs": null,
+      "createdAt": "2025-04-26T13:02:33.641Z"
+    },
+    {
+      "id": "58f81f51-c0b5-4325-a3cd-65803196bcb8",
+      "slackId": "U08PYHHT9E0",
+      "channelId": "C08PLFR675L",
+      "text": "<@U08PYHHT9E0> has joined the channel",
+      "threadTs": null,
+      "createdAt": "2025-04-26T13:02:33.641Z"
+    },
+    {
+      "id": "2970ae66-d3ff-4ba1-8f18-be423d5bd8ee",
+      "slackId": "hyunkim03",
+      "channelId": "C08PLFR675L",
+      "text": "@hyunkim03 has joined the channel",
+      "threadTs": null,
+      "createdAt": "2025-04-26T13:02:36.195Z"
+    },
+    {
+      "id": "984f6cbe-8a01-493d-9060-e9a1f97ae682",
+      "slackId": "U08PDMK2CFR",
+      "channelId": "C08PLFR675L",
+      "text": "<@U08PDMK2CFR> has joined the channel",
+      "threadTs": null,
+      "createdAt": "2025-04-26T13:02:36.195Z"
+    },
+    {
+      "id": "dcd7580c-061a-46bc-9149-c47d8dd491e7",
+      "slackId": "michael123.peng",
+      "channelId": "C08PLFR675L",
+      "text": "@michael123.peng has joined the channel",
+      "threadTs": null,
+      "createdAt": "2025-04-26T13:02:36.379Z"
+    },
+    {
+      "id": "08167079-c1e6-49ad-ba0a-c1598e03ce75",
+      "slackId": "U08PYHX1ML4",
+      "channelId": "C08PLFR675L",
+      "text": "<@U08PYHX1ML4> has joined the channel",
+      "threadTs": null,
+      "createdAt": "2025-04-26T13:02:36.379Z"
+    },
+    {
+      "id": "52390e78-ce8f-4490-aa5d-631a659adadf",
+      "slackId": "michellefeng153",
+      "channelId": "C08PLFR675L",
+      "text": "@michellefeng153 has joined the channel",
+      "threadTs": null,
+      "createdAt": "2025-04-26T13:02:36.515Z"
+    },
+    {
+      "id": "4dcad41e-fb01-4847-aa93-f87d1e5e3f65",
+      "slackId": "U08Q6RZCK25",
+      "channelId": "C08PLFR675L",
+      "text": "<@U08Q6RZCK25> has joined the channel",
+      "threadTs": null,
+      "createdAt": "2025-04-26T13:02:36.515Z"
+    },
+    {
+      "id": "a9305554-431c-4192-99f3-2e73ba965827",
+      "slackId": "uswangandrew",
+      "channelId": "C08PLFR675L",
+      "text": "Web-ui will be used primarily by PMs and Managers, ones that want to see who has been contributing to a codebase and what they've been contributing to the overall project.\n\nEngineers will primarily use the VSCode extension facing side of the product - where you can ask questions about functions, proprietary APIs, past decisions, and code conventions",
+      "threadTs": null,
+      "createdAt": "2025-04-26T13:04:42.499Z"
+    },
+    {
+      "id": "2379f264-5a6c-4706-a319-5091f76fa559",
+      "slackId": "slackbot",
+      "channelId": "C08PLFR675L",
+      "text": "",
+      "threadTs": null,
+      "createdAt": "2025-04-26T13:07:49.678Z"
+    },
+    {
+      "id": "267896c1-ab01-4c96-8bd6-4980d3e92ad7",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ2B3N",
+      "text": "Hi all !",
+      "threadTs": null,
+      "createdAt": "2025-04-26T13:41:29.805Z"
+    },
+    {
+      "id": "c9d8468a-51b0-40e8-b794-b97d82b6e108",
+      "slackId": "devatlas",
+      "channelId": "C08PYHJ2B3N",
+      "text": "@devatlas has joined the channel",
+      "threadTs": null,
+      "createdAt": "2025-04-26T14:25:41.042Z"
+    },
+    {
+      "id": "bcce80be-d1b5-487d-8d82-6a0f6cbce4d1",
+      "slackId": "U08PYJY7QNQ",
+      "channelId": "C08PYHJ2B3N",
+      "text": "<@U08PYJY7QNQ> has joined the channel",
+      "threadTs": null,
+      "createdAt": "2025-04-26T14:25:41.042Z"
+    },
+    {
+      "id": "9b110f55-64e5-4e5a-973b-fa0e2e1b4fb0",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ2B3N",
+      "text": "test",
+      "threadTs": "2025-04-26T14:25:44.418Z",
+      "createdAt": "2025-04-26T14:25:44.418Z"
+    },
+    {
+      "id": "23c605da-40c1-42ec-8ccd-57a57e7592da",
+      "slackId": "hyunkim03",
+      "channelId": "C08PYHJ2B3N",
+      "text": "hi",
+      "threadTs": "2025-04-26T14:25:44.418Z",
+      "createdAt": "2025-04-26T14:33:36.850Z"
+    },
+    {
+      "id": "8b5da3f0-5cee-47a6-8b04-7f0ab42ab026",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ2B3N",
+      "text": "some message to command f",
+      "threadTs": "2025-04-26T14:25:44.418Z",
+      "createdAt": "2025-04-26T16:11:25.747Z"
+    },
+    {
+      "id": "0d3874e1-37c6-4a79-9ec3-c539c29795bc",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ2B3N",
+      "text": "hi",
+      "threadTs": null,
+      "createdAt": "2025-04-26T14:55:36.966Z"
+    },
+    {
+      "id": "e0e1f72b-4ed6-4321-9d3a-e695b0f11098",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ2B3N",
+      "text": "test number 3",
+      "threadTs": null,
+      "createdAt": "2025-04-26T14:57:30.330Z"
+    },
+    {
+      "id": "4094b077-e37f-4f3c-a3de-3100ea43c346",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ2B3N",
+      "text": "forty borty",
+      "threadTs": null,
+      "createdAt": "2025-04-26T14:57:42.525Z"
+    },
+    {
+      "id": "41720952-f754-48ea-aec5-719d63fbb665",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ2B3N",
+      "text": "spam",
+      "threadTs": null,
+      "createdAt": "2025-04-26T14:59:14.601Z"
+    },
+    {
+      "id": "deb1215f-7afc-493a-906a-c4f89c66d7a3",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ2B3N",
+      "text": "spam",
+      "threadTs": null,
+      "createdAt": "2025-04-26T15:06:09.683Z"
+    },
+    {
+      "id": "ae12c8c2-2d8f-4a95-a1a9-2aa7f840d59d",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ2B3N",
+      "text": "oh",
+      "threadTs": null,
+      "createdAt": "2025-04-26T15:06:28.172Z"
+    },
+    {
+      "id": "7d77a3a2-5759-442a-aa00-00dd002ecaea",
+      "slackId": "devatlas",
+      "channelId": "C08PLFR675L",
+      "text": "@devatlas has joined the channel",
+      "threadTs": null,
+      "createdAt": "2025-04-26T15:07:29.732Z"
+    },
+    {
+      "id": "22214aed-c889-46d2-8ee0-efefc7319b50",
+      "slackId": "U08PYJY7QNQ",
+      "channelId": "C08PLFR675L",
+      "text": "<@U08PYJY7QNQ> has joined the channel",
+      "threadTs": null,
+      "createdAt": "2025-04-26T15:07:29.732Z"
+    },
+    {
+      "id": "21065f64-8cb2-485e-95b9-57e964891064",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ2B3N",
+      "text": "asdsada",
+      "threadTs": null,
+      "createdAt": "2025-04-26T15:10:52.285Z"
+    },
+    {
+      "id": "04656dd9-da02-41b5-89d9-cff566e9e589",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ2B3N",
+      "text": "test",
+      "threadTs": null,
+      "createdAt": "2025-04-26T15:12:50.152Z"
+    },
+    {
+      "id": "cea52661-ba71-46d9-a0f7-0045f3d9a816",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ2B3N",
+      "text": "identifiable",
+      "threadTs": null,
+      "createdAt": "2025-04-26T15:39:32.711Z"
+    },
+    {
+      "id": "65089fde-34c4-4141-b995-d1e984035145",
+      "slackId": "michael123.peng",
+      "channelId": "C08PYHJ2B3N",
+      "text": "hello!",
+      "threadTs": null,
+      "createdAt": "2025-04-26T15:48:33.853Z"
+    },
+    {
+      "id": "a8157b4b-6d9a-42bb-bb4b-573630fb4568",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ2B3N",
+      "text": "how is everyone doing today",
+      "threadTs": null,
+      "createdAt": "2025-04-26T16:50:12.551Z"
+    },
+    {
+      "id": "1caa0204-d892-467b-836d-4be9c4cf12b2",
+      "slackId": "hyunkim03",
+      "channelId": "C08PYHJ2B3N",
+      "text": "hi",
+      "threadTs": null,
+      "createdAt": "2025-04-26T16:50:13.252Z"
+    },
+    {
+      "id": "1a6758cb-59fd-4b94-8ed3-3e7ee1564171",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ2B3N",
+      "text": "a tree fell on my house",
+      "threadTs": null,
+      "createdAt": "2025-04-26T16:50:14.505Z"
+    },
+    {
+      "id": "10260b21-d7b0-4ec6-b87e-8cae69dc4422",
+      "slackId": "hyunkim03",
+      "channelId": "C08PYHJ2B3N",
+      "text": "oh no",
+      "threadTs": null,
+      "createdAt": "2025-04-26T16:50:18.575Z"
+    },
+    {
+      "id": "a85d3d17-2adb-48b9-9f0b-071b5c524be1",
+      "slackId": "hyunkim03",
+      "channelId": "C08PYHJ2B3N",
+      "text": "thats so sad",
+      "threadTs": null,
+      "createdAt": "2025-04-26T16:50:20.531Z"
+    },
+    {
+      "id": "e14283c2-9567-42a3-8612-4406b4ad48e4",
+      "slackId": "hyunkim03",
+      "channelId": "C08PYHJ2B3N",
+      "text": "can i do anything to help",
+      "threadTs": null,
+      "createdAt": "2025-04-26T16:50:25.776Z"
+    },
+    {
+      "id": "b838e37b-09e5-4b1a-bd9d-c8dd162dac53",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ2B3N",
+      "text": "no unfortunately my kitchen gas stove exlpoded on contact and everyone caught on fire",
+      "threadTs": null,
+      "createdAt": "2025-04-26T16:50:43.118Z"
+    },
+    {
+      "id": "a2eabd6e-edc3-4cf1-9a51-3ed11ba54128",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ2B3N",
+      "text": "fetch ai ressed my family",
+      "threadTs": null,
+      "createdAt": "2025-04-26T16:54:19.306Z"
+    },
+    {
+      "id": "62b8fec2-65a9-424f-975c-9d0c1cc07fa7",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ2B3N",
+      "text": "project is going well! test",
+      "threadTs": null,
+      "createdAt": "2025-04-26T17:24:12.203Z"
+    },
+    {
+      "id": "f997c667-e4ff-4810-a295-5d2d2fb35827",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ2B3N",
+      "text": "test 3031940928401938",
+      "threadTs": null,
+      "createdAt": "2025-04-26T17:26:45.760Z"
+    },
+    {
+      "id": "7b3dafe7-5d17-482b-bdba-4e200903d861",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ2B3N",
+      "text": "hihihi",
+      "threadTs": null,
+      "createdAt": "2025-04-26T17:27:58.035Z"
+    },
+    {
+      "id": "54c6bdb4-f23a-4fd5-b903-6b7060b9bc24",
+      "slackId": "devatlas",
+      "channelId": "C08PYHJ3ANQ",
+      "text": "@devatlas has joined the channel",
+      "threadTs": null,
+      "createdAt": "2025-04-26T17:57:43.154Z"
+    },
+    {
+      "id": "c57a33d7-e73b-4da9-9055-fe823cac0b11",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ3ANQ",
+      "text": "agent bond",
+      "threadTs": null,
+      "createdAt": "2025-04-26T18:00:54.661Z"
+    },
+    {
+      "id": "68f73368-8dbe-4ff0-9fcf-c5d791e116b8",
+      "slackId": "hyunkim03",
+      "channelId": "C08PYHJ2B3N",
+      "text": "Hey by the way I integrated the knowledge graph",
+      "threadTs": null,
+      "createdAt": "2025-04-26T19:51:08.109Z"
+    },
+    {
+      "id": "9092de24-41eb-49df-95de-50b5b53e4040",
+      "slackId": "hyunkim03",
+      "channelId": "C08PYHJ2B3N",
+      "text": "I ran into some bugs when it came to a RAG",
+      "threadTs": null,
+      "createdAt": "2025-04-26T19:51:18.486Z"
+    },
+    {
+      "id": "fbb8798d-7bd7-40aa-9ef2-efa3d640ce51",
+      "slackId": "hyunkim03",
+      "channelId": "C08PYHJ2B3N",
+      "text": "I just used AS1 for the LLM",
+      "threadTs": null,
+      "createdAt": "2025-04-26T19:51:20.755Z"
+    },
+    {
+      "id": "8896c550-8510-4234-bac7-e40646157c99",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ2B3N",
+      "text": "Thank you so much daniel for integrating that! What's the status on importing data from  my slack function?",
+      "threadTs": null,
+      "createdAt": "2025-04-26T19:51:32.214Z"
+    },
+    {
+      "id": "a9f662f4-e2a2-4401-a2d9-1868b5ced41b",
+      "slackId": "hyunkim03",
+      "channelId": "C08PYHJ2B3N",
+      "text": "I think the RAG is going well, almost done",
+      "threadTs": null,
+      "createdAt": "2025-04-26T19:51:42.557Z"
+    },
+    {
+      "id": "bfaeee10-761f-4b22-8a7b-617d316e5144",
+      "slackId": "hyunkim03",
+      "channelId": "C08PYHJ2B3N",
+      "text": "Will start getting on top of the frontend soon",
+      "threadTs": null,
+      "createdAt": "2025-04-26T19:51:49.347Z"
+    },
+    {
+      "id": "d02b021b-e887-4488-a66d-e344488c2d3e",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ2B3N",
+      "text": "Im working on the vscode extensino right now",
+      "threadTs": null,
+      "createdAt": "2025-04-26T19:54:43.107Z"
+    },
+    {
+      "id": "20b6784c-c6ce-4cc1-b504-b3d19462940a",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ2B3N",
+      "text": "current plan is to hold an iframe inside a VSCODE sidebar that links to our frontend web app",
+      "threadTs": null,
+      "createdAt": "2025-04-26T19:54:57.533Z"
+    },
+    {
+      "id": "4824a476-0a67-4255-b5f6-c46ffb79d071",
+      "slackId": "uswangandrew",
+      "channelId": "C08PLFR675L",
+      "text": "Working on ai integratino",
+      "threadTs": null,
+      "createdAt": "2025-04-26T21:24:51.226Z"
+    },
+    {
+      "id": "6ca90e5e-4dad-4140-aa07-207fa0e75b94",
+      "slackId": "hyunkim03",
+      "channelId": "C08PYHJ2B3N",
+      "text": "im working on the frontend right now",
+      "threadTs": null,
+      "createdAt": "2025-04-26T22:46:02.963Z"
+    }
+  ],
+  "textChunks": [
+    {
+      "id": "chunk-1",
+      "sourceId": "pr-1",
+      "sourceType": "PullRequest",
+      "content": "This PR adds OAuth2 integration with Google and GitHub providers. It includes new API endpoints for authentication flow and updates to the user model to store OAuth tokens."
+    },
+    {
+      "id": "chunk-2",
+      "sourceId": "pr-1",
+      "sourceType": "PullRequest",
+      "content": "Related to #28 and fixes #15."
+    },
+    {
+      "id": "chunk-3",
+      "sourceId": "issue-1",
+      "sourceType": "Issue",
+      "content": "We need to implement OAuth2 authentication to support Google and GitHub login. This should include: OAuth2 client setup, Login flow, Token storage, User profile syncing"
+    },
+    {
+      "id": "chunk-4",
+      "sourceId": "message-1",
+      "sourceType": "SlackMessage",
+      "content": "I just opened PR #42 to add OAuth integration: https://github.com/acme/user-service/pull/42"
+    },
+    {
+      "id": "chunk-5",
+      "sourceId": "message-4",
+      "sourceType": "SlackMessage",
+      "content": "@taylor-eng I'm working on the OAuth PR (#42). Could you look at my approach for storing the tokens? Not sure if we should encrypt them or just hash them."
+    }
+  ]
+}
