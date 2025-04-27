@@ -160,7 +160,9 @@ def create_relationships(neo4j: Neo4jService, data: Dict[str, Any]) -> Dict[str,
         # This is a simplified approach - in a real system you'd parse the PR body
         # to extract issue references like "fixes #123" or "closes #456"
         for pr in data["pullRequests"]:
-            body = pr.get("body", "").lower()
+            # Fix to safely handle None values in body
+            body = pr.get("body", "") or ""
+            body = body.lower()
             
             # Find issues referenced in the PR body
             for issue in data["issues"]:

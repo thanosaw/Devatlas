@@ -9,275 +9,193 @@ logger = logging.getLogger(__name__)
 
 class GitHubProcessor:
     """
-    Class to process GitHub webhook events and extract relevant entities.
+    Class to process GitHub webhook events and save data to collective.json
+    in a structured format with users, repositories, pullRequests, and issues.
     """
+    
+    # Path to collective.json file
+    COLLECTIVE_FILE_PATH = "collective.json"
     
     @classmethod
     def process_webhook(cls, event_type: str, payload: Dict[Any, Any]) -> List[Dict]:
         """
-        Process a GitHub webhook event and extract relevant entities.
+        Process a GitHub webhook event and store data in collective.json
         
         Args:
             event_type: The type of GitHub event (push, pull_request, etc.)
             payload: The webhook payload from GitHub
             
         Returns:
-            List of entities extracted from the event
+            List of entities that were added or updated
         """
-        entities = []
+        # Load existing data or create structure if file doesn't exist
+        collective_data = cls._load_collective_data()
         
-        # Extract common data
-        repository = cls._extract_repository_data(payload)
-        if repository:
-            entities.append(repository)
+        # Track entities that were added or updated
+        processed_entities = []
         
-        # Extract contributor data
-        contributor = cls._extract_contributor(event_type, payload)
-        if contributor:
-            entities.append(contributor)
+        # Process repository data
+        if "repository" in payload:
+            repo_data = cls._process_repository(payload["repository"])
+            if repo_data:
+                # Check if repository already exists
+                existing_repo = next((r for r in collective_data["repositories"] 
+                                    if r["id"] == repo_data["id"]), None)
+                if not existing_repo:
+                    collective_data["repositories"].append(repo_data)
+                    processed_entities.append({"type": "repository", "id": repo_data["id"]})
         
-        # Process specific event types
-        if event_type == "push":
-            push_data = cls._process_push_event(payload)
-            if push_data:
-                entities.append(push_data)
-                
-        elif event_type == "pull_request":
-            pr_data = cls._process_pull_request_event(payload)
+        # Process user/contributor data
+        if "sender" in payload or "user" in payload:
+            user_data = cls._process_user(payload.get("sender") or 
+                                         payload.get("user") or 
+                                         payload.get("pull_request", {}).get("user") or
+                                         payload.get("issue", {}).get("user"))
+            if user_data:
+                # Check if user already exists
+                existing_user = next((u for u in collective_data["users"] 
+                                    if u["id"] == user_data["id"]), None)
+                if not existing_user:
+                    collective_data["users"].append(user_data)
+                    processed_entities.append({"type": "user", "id": user_data["id"]})
+        
+        # Process PR data
+        if event_type == "pull_request" and "pull_request" in payload:
+            pr_data = cls._process_pull_request(payload["pull_request"], payload["repository"])
             if pr_data:
-                entities.append(pr_data)
+                # Check if PR already exists with this author
+                author_pr_exists = False
+                for existing_pr in collective_data["pullRequests"]:
+                    if (existing_pr["number"] == pr_data["number"] and 
+                        existing_pr["repositoryId"] == pr_data["repositoryId"] and
+                        existing_pr["authorId"] == pr_data["authorId"]):
+                        author_pr_exists = True
+                        # Update existing PR
+                        existing_pr.update(pr_data)
+                        processed_entities.append({"type": "pull_request", "id": pr_data["id"]})
+                        break
                 
-        elif event_type == "issues":
-            issue_data = cls._process_issue_event(payload)
+                # If PR with this author doesn't exist, add it
+                if not author_pr_exists:
+                    collective_data["pullRequests"].append(pr_data)
+                    processed_entities.append({"type": "pull_request", "id": pr_data["id"]})
+        
+        # Process Issue data
+        if event_type == "issues" and "issue" in payload:
+            issue_data = cls._process_issue(payload["issue"], payload["repository"])
             if issue_data:
-                entities.append(issue_data)
+                # Check if issue already exists
+                existing_issue = next((i for i in collective_data["issues"] 
+                                     if i["id"] == issue_data["id"]), None)
+                if existing_issue:
+                    # Update existing issue
+                    existing_issue.update(issue_data)
+                    processed_entities.append({"type": "issue", "id": issue_data["id"]})
+                else:
+                    collective_data["issues"].append(issue_data)
+                    processed_entities.append({"type": "issue", "id": issue_data["id"]})
+        
+        # Save the updated collective data
+        cls._save_collective_data(collective_data)
+        
+        return processed_entities
+    
+    @classmethod
+    def _load_collective_data(cls) -> Dict[str, List[Dict]]:
+        """Load data from collective.json or create empty structure"""
+        if os.path.exists(cls.COLLECTIVE_FILE_PATH):
+            try:
+                with open(cls.COLLECTIVE_FILE_PATH, 'r') as f:
+                    data = json.load(f)
                 
-        elif event_type == "issue_comment":
-            comment_data = cls._process_issue_comment_event(payload)
-            if comment_data:
-                entities.append(comment_data)
+                # Ensure all required sections exist
+                for section in ["users", "repositories", "pullRequests", "issues"]:
+                    if section not in data:
+                        data[section] = []
                 
-        elif event_type == "pull_request_review":
-            review_data = cls._process_pr_review_event(payload)
-            if review_data:
-                entities.append(review_data)
-                
-        elif event_type == "pull_request_review_comment":
-            review_comment_data = cls._process_pr_review_comment_event(payload)
-            if review_comment_data:
-                entities.append(review_comment_data)
+                return data
+            except json.JSONDecodeError:
+                logger.error(f"Error parsing {cls.COLLECTIVE_FILE_PATH}, creating new file")
         
-        # Save extracted entities to the actions file
-        if entities:
-            cls._save_to_actions_file(entities)
-        
-        return entities
-    
-    @staticmethod
-    def _extract_repository_data(payload: Dict) -> Optional[Dict]:
-        """Extract repository information from the payload."""
-        if "repository" not in payload:
-            return None
-            
-        repo = payload["repository"]
+        # Return empty structure if file doesn't exist or is invalid
         return {
-            "type": "repository",
-            "id": repo.get("id"),
-            "name": repo.get("name"),
-            "full_name": repo.get("full_name"),
-            "url": repo.get("html_url"),
-            "description": repo.get("description"),
-            "owner": repo.get("owner", {}).get("login"),
-            "timestamp": datetime.now().isoformat()
-        }
-    
-    @staticmethod
-    def _extract_contributor(event_type: str, payload: Dict) -> Optional[Dict]:
-        """Extract contributor information based on event type."""
-        user_data = None
-        
-        if event_type == "push":
-            user_data = payload.get("sender")
-        elif event_type == "pull_request":
-            user_data = payload.get("pull_request", {}).get("user")
-        elif event_type == "issues":
-            user_data = payload.get("issue", {}).get("user")
-        elif event_type == "issue_comment":
-            user_data = payload.get("comment", {}).get("user")
-        elif event_type in ["pull_request_review", "pull_request_review_comment"]:
-            user_data = payload.get("review", {}).get("user") or payload.get("comment", {}).get("user")
-        
-        if not user_data:
-            return None
-            
-        return {
-            "type": "contributor",
-            "id": user_data.get("id"),
-            "login": user_data.get("login"),
-            "name": user_data.get("name", user_data.get("login")),
-            "avatar_url": user_data.get("avatar_url"),
-            "url": user_data.get("html_url"),
-            "timestamp": datetime.now().isoformat()
-        }
-    
-    @staticmethod
-    def _process_push_event(payload: Dict) -> Optional[Dict]:
-        """Process push event data."""
-        if "commits" not in payload:
-            return None
-            
-        commits = payload.get("commits", [])
-        commit_count = len(commits)
-        
-        return {
-            "type": "push",
-            "id": payload.get("after"),
-            "ref": payload.get("ref"),
-            "commit_count": commit_count,
-            "commits": [
-                {
-                    "id": commit.get("id"),
-                    "message": commit.get("message"),
-                    "author": commit.get("author", {}).get("name"),
-                    "url": commit.get("url")
-                }
-                for commit in commits[:5]  # Limit to first 5 commits
-            ],
-            "timestamp": datetime.now().isoformat()
-        }
-    
-    @staticmethod
-    def _process_pull_request_event(payload: Dict) -> Optional[Dict]:
-        """Process pull request event data."""
-        if "pull_request" not in payload:
-            return None
-            
-        pr = payload.get("pull_request", {})
-        
-        return {
-            "type": "pull_request",
-            "id": pr.get("id"),
-            "number": pr.get("number"),
-            "title": pr.get("title"),
-            "state": pr.get("state"),
-            "action": payload.get("action"),
-            "created_at": pr.get("created_at"),
-            "updated_at": pr.get("updated_at"),
-            "merged": pr.get("merged", False),
-            "url": pr.get("html_url"),
-            "timestamp": datetime.now().isoformat()
-        }
-    
-    @staticmethod
-    def _process_issue_event(payload: Dict) -> Optional[Dict]:
-        """Process issue event data."""
-        if "issue" not in payload:
-            return None
-            
-        issue = payload.get("issue", {})
-        
-        return {
-            "type": "issue",
-            "id": issue.get("id"),
-            "number": issue.get("number"),
-            "title": issue.get("title"),
-            "state": issue.get("state"),
-            "action": payload.get("action"),
-            "created_at": issue.get("created_at"),
-            "updated_at": issue.get("updated_at"),
-            "url": issue.get("html_url"),
-            "timestamp": datetime.now().isoformat()
-        }
-    
-    @staticmethod
-    def _process_issue_comment_event(payload: Dict) -> Optional[Dict]:
-        """Process issue comment event data."""
-        if "comment" not in payload or "issue" not in payload:
-            return None
-            
-        comment = payload.get("comment", {})
-        issue = payload.get("issue", {})
-        
-        return {
-            "type": "issue_comment",
-            "id": comment.get("id"),
-            "issue_id": issue.get("id"),
-            "issue_number": issue.get("number"),
-            "body": comment.get("body", "")[:100],  # Truncate long comments
-            "action": payload.get("action"),
-            "created_at": comment.get("created_at"),
-            "updated_at": comment.get("updated_at"),
-            "url": comment.get("html_url"),
-            "timestamp": datetime.now().isoformat()
-        }
-    
-    @staticmethod
-    def _process_pr_review_event(payload: Dict) -> Optional[Dict]:
-        """Process pull request review event data."""
-        if "review" not in payload or "pull_request" not in payload:
-            return None
-            
-        review = payload.get("review", {})
-        pr = payload.get("pull_request", {})
-        
-        return {
-            "type": "pr_review",
-            "id": review.get("id"),
-            "pr_id": pr.get("id"),
-            "pr_number": pr.get("number"),
-            "state": review.get("state"),
-            "action": payload.get("action"),
-            "body": review.get("body", "")[:100],  # Truncate long reviews
-            "submitted_at": review.get("submitted_at"),
-            "url": review.get("html_url"),
-            "timestamp": datetime.now().isoformat()
-        }
-    
-    @staticmethod
-    def _process_pr_review_comment_event(payload: Dict) -> Optional[Dict]:
-        """Process pull request review comment event data."""
-        if "comment" not in payload or "pull_request" not in payload:
-            return None
-            
-        comment = payload.get("comment", {})
-        pr = payload.get("pull_request", {})
-        
-        return {
-            "type": "pr_review_comment",
-            "id": comment.get("id"),
-            "pr_id": pr.get("id"),
-            "pr_number": pr.get("number"),
-            "body": comment.get("body", "")[:100],  # Truncate long comments
-            "action": payload.get("action"),
-            "created_at": comment.get("created_at"),
-            "updated_at": comment.get("updated_at"),
-            "url": comment.get("html_url"),
-            "timestamp": datetime.now().isoformat()
+            "users": [],
+            "repositories": [],
+            "pullRequests": [],
+            "issues": []
         }
     
     @classmethod
-    def _save_to_actions_file(cls, entities: List[Dict]) -> None:
-        """Save entities to the actions file."""
-        actions_file = settings.ACTIONS_FILE_PATH
+    def _save_collective_data(cls, data: Dict[str, List[Dict]]) -> None:
+        """Save data to collective.json file"""
+        with open(cls.COLLECTIVE_FILE_PATH, 'w') as f:
+            json.dump(data, f, indent=2)
         
-        # Create directory if it doesn't exist
-        os.makedirs(os.path.dirname(os.path.abspath(actions_file)), exist_ok=True)
+        logger.info(f"Updated collective.json with {len(data['users'])} users, "
+                   f"{len(data['repositories'])} repositories, "
+                   f"{len(data['pullRequests'])} pull requests, "
+                   f"{len(data['issues'])} issues")
+    
+    @staticmethod
+    def _process_repository(repo_data: Dict) -> Dict:
+        """Process repository data into the required format"""
+        if not repo_data:
+            return None
         
-        # Load existing data
-        existing_data = []
-        if os.path.exists(actions_file):
-            try:
-                with open(actions_file, 'r') as f:
-                    existing_data = json.load(f)
-            except json.JSONDecodeError:
-                # If file exists but is empty or invalid JSON
-                existing_data = []
+        return {
+            "id": f"repo-{repo_data.get('id', '')}",
+            "name": repo_data.get("name", ""),
+            "fullName": repo_data.get("full_name", ""),
+            "description": repo_data.get("description", "")
+        }
+    
+    @staticmethod
+    def _process_user(user_data: Dict) -> Dict:
+        """Process user data into the required format"""
+        if not user_data:
+            return None
         
-        # Add new entities
-        updated_data = existing_data + entities
+        return {
+            "id": f"user-{user_data.get('id', '')}",
+            "githubLogin": user_data.get("login", ""),
+            "name": user_data.get("name", ""),
+            "email": user_data.get("email")
+        }
+    
+    @staticmethod
+    def _process_pull_request(pr_data: Dict, repo_data: Dict) -> Dict:
+        """Process PR data into the required format"""
+        if not pr_data:
+            return None
         
-        # Save updated data
-        with open(actions_file, 'w') as f:
-            json.dump(updated_data, f, indent=2)
+        return {
+            "id": str(pr_data.get("id", "")),
+            "number": pr_data.get("number"),
+            "title": pr_data.get("title", ""),
+            "body": pr_data.get("body", ""),
+            "state": pr_data.get("state", ""),
+            "createdAt": pr_data.get("created_at", ""),
+            "authorId": f"user-{pr_data.get('user', {}).get('id', '')}" if pr_data.get('user') else None,
+            "repositoryId": f"repo-{repo_data.get('id', '')}" if repo_data else None
+        }
+    
+    @staticmethod
+    def _process_issue(issue_data: Dict, repo_data: Dict) -> Dict:
+        """Process issue data into the required format"""
+        if not issue_data:
+            return None
+        
+        # Skip issues that are actually pull requests
+        if "pull_request" in issue_data:
+            return None
             
-        logger.info(f"Saved {len(entities)} entities to {actions_file}") 
+        return {
+            "id": f"issue-{issue_data.get('id', '')}",
+            "number": issue_data.get("number"),
+            "title": issue_data.get("title", ""),
+            "body": issue_data.get("body", ""),
+            "state": issue_data.get("state", ""),
+            "createdAt": issue_data.get("created_at", ""),
+            "authorId": f"user-{issue_data.get('user', {}).get('id', '')}" if issue_data.get('user') else None,
+            "repositoryId": f"repo-{repo_data.get('id', '')}" if repo_data else None
+        } 
