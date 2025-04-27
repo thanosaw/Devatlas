@@ -250,7 +250,7 @@ print("\nInitializing sentence transformer embedder...")
 embedder = SentenceTransformerEmbeddings(model="all-MiniLM-L6-v2")
 
 # Query the graph function
-def query_rag(query_text, top_k=100, capture_debug=None):
+def query_rag(query_text, top_k=500, capture_debug=None):
     """
     Query the graph using RAG and return the answer with metadata.
     
