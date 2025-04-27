@@ -10,12 +10,23 @@ import hashlib
 import asyncio
 import threading
 from typing import Optional, List, Dict
+from fastapi.middleware.cors import CORSMiddleware
 from backend.routes import webhooks
 from backend.config import settings
 from backend.services.github_service import process_push_event
 from backend.slack_monitor import slack_monitor, start_monitor
 
 app = FastAPI()
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Frontend dev server
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(webhooks.router, prefix="/webhooks", tags=["webhooks"])
 
 # Global variables to store background threads
@@ -284,6 +295,56 @@ async def get_thread_replies(channel_id: str, thread_ts: str):
             "parent_message": parent_message,
             "replies": replies,
             "reply_count": len(replies)
+        }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+@app.post("/slack/deduplicate")
+async def remove_duplicate_messages():
+    """
+    Remove duplicate messages from the Slack entities file.
+    This endpoint will scan the entities file and remove any duplicate messages based on content.
+    """
+    try:
+        # Get the entity data (this now includes deduplication logic)
+        entity_data = slack_monitor.get_entity_message_data()
+        
+        # Count before and after
+        original_count = entity_data.get("original_count", 0)
+        current_count = len(entity_data.get("messages", []))
+        
+        return {
+            "status": "success",
+            "message": f"Duplicate messages removed successfully",
+            "details": {
+                "original_message_count": original_count,
+                "current_message_count": current_count,
+                "duplicates_removed": original_count - current_count if original_count > current_count else 0
+            }
+        }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+@app.post("/slack/sort-messages")
+async def sort_messages_by_thread():
+    """
+    Sort all Slack messages first by thread and then chronologically.
+    This endpoint organizes messages so that related thread messages are grouped together.
+    """
+    try:
+        # Get the entity data (this will trigger the sort operation)
+        entity_data = slack_monitor.get_entity_message_data()
+        
+        # Get the file path from the module
+        from backend.slack_monitor import SLACK_ENTITIES_FILE
+        
+        return {
+            "status": "success",
+            "message": "Messages sorted by thread and chronological order",
+            "details": {
+                "message_count": len(entity_data.get("messages", [])),
+                "file_path": SLACK_ENTITIES_FILE
+            }
         }
     except Exception as e:
         return {"status": "error", "message": str(e)}
