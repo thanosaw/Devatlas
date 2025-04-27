@@ -247,6 +247,16 @@
       "createdAt": "2025-04-26T20:28:22Z",
       "authorId": "user-32288183",
       "repositoryId": "repo-MichaelPeng123-lahacks2025"
+    },
+    {
+      "id": "2484047221",
+      "number": 24,
+      "title": "Mike/agentwork",
+      "body": "yo",
+      "state": "open",
+      "createdAt": "2025-04-27T07:21:03Z",
+      "authorId": "user-32288183",
+      "repositoryId": "repo-973000550"
     }
   ],
   "issues": [
