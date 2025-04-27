@@ -201,7 +201,19 @@ class SlackMonitor:
             }
             data["channels"].append(channel_entity)
         
+        # Create a set of existing message content keys to check for duplicates
+        # We don't use slackId in the key to avoid duplicates with different ID formats
+        existing_content = set()
+        for message in data["messages"]:
+            content_key = (
+                message.get("text", ""), 
+                message.get("channelId", ""),
+                message.get("createdAt", "")
+            )
+            existing_content.add(content_key)
+            
         # Process and add new messages
+        added_count = 0
         for msg in new_messages:
             # Process user IDs in the message
             processed_msg = self._process_message_users(msg)
@@ -228,20 +240,116 @@ class SlackMonitor:
                 "createdAt": iso_created_at
             }
             
-            # Add to messages list
-            data["messages"].append(message_entity)
+            # Check if this message content already exists before adding
+            # We only check the content, not the user ID
+            content_key = (
+                message_entity["text"], 
+                message_entity["channelId"],
+                message_entity["createdAt"]
+            )
+            
+            if content_key not in existing_content:
+                # Add to messages list only if not a duplicate
+                data["messages"].append(message_entity)
+                existing_content.add(content_key)
+                added_count += 1
         
-        # Update metadata
-        data["last_updated"] = datetime.now().isoformat()
+        if added_count > 0:
+            # Update last_updated timestamp
+            data["last_updated"] = datetime.now().isoformat()
+            
+            # Save updated data
+            self._save_entities_to_file(data)
+            logger.info(f"Added {added_count} new messages to entity storage")
+        else:
+            logger.info("No new messages added to entity storage (all were duplicates)")
         
-        # Save updated data
-        self._save_entities_to_file(data)
+        return added_count
     
     def get_entity_message_data(self):
         """Get all Slack messages in the entity format from the JSON storage file"""
         try:
             with open(SLACK_ENTITIES_FILE, 'r') as f:
-                return json.load(f)
+                data = json.load(f)
+                
+                # Filter out duplicate messages
+                if "messages" in data:
+                    # Create a set to track unique message content
+                    seen_messages = set()
+                    unique_messages = []
+                    
+                    # Group messages by content, channel, and timestamp 
+                    # (ignoring slackId differences)
+                    message_groups = {}
+                    
+                    # First pass: group messages by their content/channel/timestamp
+                    for message in data["messages"]:
+                        # Create a content key based on text, channel, and timestamp
+                        # (but NOT the user ID which may appear in multiple formats)
+                        content_key = (
+                            message.get("text", ""), 
+                            message.get("channelId", ""),
+                            message.get("createdAt", "")
+                        )
+                        
+                        if content_key not in message_groups:
+                            message_groups[content_key] = []
+                        
+                        message_groups[content_key].append(message)
+                    
+                    # Second pass: for each group, pick one message to keep
+                    # Prefer messages with username (non-U prefixed IDs) over user IDs
+                    for content_key, group in message_groups.items():
+                        if not group:
+                            continue
+                            
+                        # Sort the group to prefer usernames over user IDs
+                        # (Slack IDs start with 'U' followed by alphanumeric chars)
+                        sorted_group = sorted(group, key=lambda m: 1 if m.get("slackId", "").startswith("U") else 0)
+                        
+                        # Add the best one to our unique messages list
+                        unique_messages.append(sorted_group[0])
+                    
+                    # Replace with deduplicated messages
+                    original_count = len(data["messages"])
+                    data["messages"] = unique_messages
+                    
+                    # Sort messages first by thread and then chronologically
+                    
+                    # 1. Group messages by thread
+                    thread_groups = {}
+                    for message in data["messages"]:
+                        # For thread parents or standalone messages, use their createdAt as the thread key
+                        thread_key = message.get("threadTs") or message.get("createdAt")
+                        if thread_key not in thread_groups:
+                            thread_groups[thread_key] = []
+                        thread_groups[thread_key].append(message)
+                    
+                    # 2. Sort each thread group chronologically
+                    for thread_key in thread_groups:
+                        thread_groups[thread_key].sort(key=lambda m: m.get("createdAt", ""))
+                    
+                    # 3. Flatten the sorted thread groups into a single list
+                    # First sort the threads themselves chronologically by their first message
+                    sorted_thread_keys = sorted(thread_groups.keys())
+                    
+                    # Then flatten the groups
+                    sorted_messages = []
+                    for thread_key in sorted_thread_keys:
+                        sorted_messages.extend(thread_groups[thread_key])
+                    
+                    # Update the messages list with sorted messages
+                    data["messages"] = sorted_messages
+                    
+                    # Add original count to track deduplication stats
+                    data["original_count"] = original_count
+                    
+                    # If duplicates were removed or messages were resorted, save the file
+                    if len(unique_messages) < original_count or data["messages"] != unique_messages:
+                        logger.info(f"Removed {original_count - len(unique_messages)} duplicate messages and sorted by thread and time")
+                        self._save_entities_to_file(data)
+                
+                return data
         except Exception as e:
             logger.error(f"Error reading entity message data: {str(e)}")
             return None
@@ -456,7 +564,19 @@ class SlackMonitor:
         # Load current entity data
         data = self._load_entities_from_file()
         
+        # Create a set of existing message content keys to check for duplicates
+        # We don't use slackId in the key to avoid duplicates with different ID formats
+        existing_content = set()
+        for message in data["messages"]:
+            content_key = (
+                message.get("text", ""), 
+                message.get("channelId", ""),
+                message.get("createdAt", "")
+            )
+            existing_content.add(content_key)
+        
         # Process and add thread replies
+        added_count = 0
         for reply in thread_replies:
             # Process user IDs in the message
             processed_reply = self._process_message_users(reply)
@@ -483,21 +603,32 @@ class SlackMonitor:
                 "createdAt": iso_created_at
             }
             
-            # Check if this reply is already in the storage to avoid duplicates
-            existing_replies = [m for m in data["messages"] 
-                               if m.get("slackId") == username and 
-                                  m.get("createdAt") == iso_created_at]
+            # Check if this message content already exists before adding
+            # We only check the content, not the user ID
+            content_key = (
+                message_entity["text"], 
+                message_entity["channelId"],
+                message_entity["createdAt"]
+            )
             
-            if not existing_replies:
-                # Add to messages list
+            if content_key not in existing_content:
+                # Add to messages list only if not a duplicate
                 data["messages"].append(message_entity)
+                existing_content.add(content_key)
+                added_count += 1
         
-        # Update metadata
-        data["last_updated"] = datetime.now().isoformat()
-        
-        # Save updated data
-        self._save_entities_to_file(data)
+        if added_count > 0:
+            # Update metadata
+            data["last_updated"] = datetime.now().isoformat()
             
+            # Save updated data
+            self._save_entities_to_file(data)
+            logger.info(f"Added {added_count} new thread replies to entity storage")
+        else:
+            logger.info("No new thread replies added (all were duplicates)")
+            
+        return added_count
+    
     async def check_for_updates(self) -> Dict:
         """
         Check all monitored channels for new messages
