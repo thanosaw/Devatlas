@@ -501,7 +501,7 @@ async def chat_endpoint_post(chat_query: ChatQuery):
         debug_info = {}
         
         # Call the RAG system with the query
-        answer, node_type, reason = query_rag(query, top_k=5, capture_debug=debug_info)
+        answer, node_type, reason = query_rag(query, top_k=500, capture_debug=debug_info)
         
         return {
             "status": "success",
