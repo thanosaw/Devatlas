@@ -76,7 +76,7 @@ def main():
     except Exception as e:
         print(f"Error calling GitHub data endpoint: {str(e)}")
         print("Stopping execution - cannot proceed without fresh GitHub data")
-        sys.exit(1)  # Exit with error code
+
     
     # Only continue here if GitHub data was successfully fetched
     print("GitHub data successfully fetched, continuing with process...")
