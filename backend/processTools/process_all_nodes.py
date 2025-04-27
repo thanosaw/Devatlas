@@ -6,7 +6,7 @@ import json
 import os
 from typing import Dict, Any, List
 from embedding_service import EmbeddingService
-from update_mock_data import update_mock_with_slack_data
+from update_mock_data import update_mock_with_slack_data, update_mock_with_github_data
 
 INPUT_FILE = "backend/processTools/mock.json"
 OUTPUT_FILE = "backend/processTools/mock_with_embeddings.json"
@@ -66,6 +66,11 @@ def main():
         print("Failed to update mock.json with Slack data")
         return
     
+    update_result = update_mock_with_github_data()
+    if not update_result:
+        print("Failed to update mock.json with github data")
+        return
+
     if not os.path.exists(INPUT_FILE):
         print(f"Error: Input file {INPUT_FILE} not found")
         return

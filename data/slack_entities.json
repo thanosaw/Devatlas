@@ -381,7 +381,71 @@
       "text": "@uswangandrew has joined the channel",
       "threadTs": null,
       "createdAt": "2025-04-26T13:02:33.641Z"
+    },
+    {
+      "id": "0d64a6e4-28de-45f3-af55-58c6a7d3edbc",
+      "slackId": "devatlas",
+      "channelId": "C08PYHJ2B3N",
+      "text": "@devatlas has joined the channel",
+      "threadTs": null,
+      "createdAt": "2025-04-26T23:58:25.865Z"
+    },
+    {
+      "id": "72296768-99b0-4b60-925e-9e87671da5ce",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ2B3N",
+      "text": "the rag should be able to read our messages",
+      "threadTs": null,
+      "createdAt": "2025-04-26T23:43:42.135Z"
+    },
+    {
+      "id": "cc294b71-4857-4d4f-b1bf-bc432fc888b9",
+      "slackId": "uswangandrew",
+      "channelId": "C08PYHJ2B3N",
+      "text": "im working on rag implementation",
+      "threadTs": null,
+      "createdAt": "2025-04-26T23:43:38.032Z"
+    },
+    {
+      "id": "3f01868c-fde3-4b29-9f23-0fa1e70b94c6",
+      "slackId": "hyunkim03",
+      "channelId": "C08PYHJ2B3N",
+      "text": "im working on the frontend right now",
+      "threadTs": null,
+      "createdAt": "2025-04-26T22:46:02.963Z"
+    },
+    {
+      "id": "f975ba25-97a3-4938-b4f4-52584808ef3a",
+      "slackId": "devatlas",
+      "channelId": "C08PLFR675L",
+      "text": "@devatlas has joined the channel",
+      "threadTs": null,
+      "createdAt": "2025-04-26T23:58:30.811Z"
+    },
+    {
+      "id": "1fe392e0-928a-4d85-b4df-0e0eb4da591f",
+      "slackId": "hyunkim03",
+      "channelId": "C08PYHJ2B3N",
+      "text": "I have a knowledge graph visuzalization",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:29:38.202Z"
+    },
+    {
+      "id": "8b4010bc-e8bc-4ec9-ba33-e01fc60db0de",
+      "slackId": "hyunkim03",
+      "channelId": "C08PYHJ2B3N",
+      "text": "I got the chatbot interface to work",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:29:30.701Z"
+    },
+    {
+      "id": "728e3715-d7e3-4c71-b036-06849b73c98f",
+      "slackId": "hyunkim03",
+      "channelId": "C08PYHJ2B3N",
+      "text": "I am wokring on the frontend",
+      "threadTs": null,
+      "createdAt": "2025-04-27T00:29:26.777Z"
     }
   ],
-  "last_updated": "2025-04-26T22:28:50.055296"
+  "last_updated": "2025-04-27T00:29:39.886857"
 }

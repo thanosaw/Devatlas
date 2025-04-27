@@ -1,8 +1,49 @@
 {
-  "repository": "MichaelPeng123/lahacks2025",
-  "timestamp": "2025-04-26T23:53:34.461959",
-  "count": 19,
-  "pull_requests": [
+  "users": [
+    {
+      "id": "user-32288183",
+      "githubLogin": "MichaelPeng123",
+      "name": "Michael Peng",
+      "email": null
+    },
+    {
+      "id": "user-125724364",
+      "githubLogin": "Yatsz",
+      "name": "Daniel Kim",
+      "email": null
+    },
+    {
+      "id": "user-56616222",
+      "githubLogin": "thanosaw",
+      "name": null,
+      "email": null
+    }
+  ],
+  "repositories": [
+    {
+      "id": "repo-973000550",
+      "name": "lahacks2025",
+      "fullName": "MichaelPeng123/lahacks2025",
+      "description": null
+    }
+  ],
+  "pullRequests": [
+    {
+      "id": "2484047221",
+      "number": 24,
+      "title": "Mike/agentwork",
+      "body": "yo",
+      "state": "open",
+      "createdAt": "2025-04-27T07:21:03Z"
+    },
+    {
+      "id": "2484032003",
+      "number": 23,
+      "title": "Mike/gitapi",
+      "body": "merging github api pr fetches into main",
+      "state": "closed",
+      "createdAt": "2025-04-27T06:56:02Z"
+    },
     {
       "id": "2484000082",
       "number": 22,
@@ -16,7 +57,7 @@
       "number": 21,
       "title": "Mike/agentwork",
       "body": "github side",
-      "state": "open",
+      "state": "closed",
       "createdAt": "2025-04-27T04:22:21Z"
     },
     {
@@ -154,6 +195,48 @@
       "body": "pls merge this",
       "state": "closed",
       "createdAt": "2025-04-26T20:28:22Z"
+    }
+  ],
+  "issues": [
+    {
+      "id": "issue-3022876084",
+      "number": 25,
+      "title": "frontend development",
+      "body": "Implementing the frontend",
+      "state": "open",
+      "createdAt": "2025-04-27T07:29:18Z",
+      "authorId": "user-125724364",
+      "repositoryId": "repo-MichaelPeng123-lahacks2025"
+    },
+    {
+      "id": "issue-3022637552",
+      "number": 18,
+      "title": "Knowledge Graph + RAG Integration with AS1",
+      "body": null,
+      "state": "closed",
+      "createdAt": "2025-04-27T03:44:20Z",
+      "authorId": "user-125724364",
+      "repositoryId": "repo-MichaelPeng123-lahacks2025"
+    },
+    {
+      "id": "issue-3022471666",
+      "number": 8,
+      "title": "Neo4j Setup",
+      "body": "Integrate Neo4j for a knowledge and build out the scaffolding for the database setup",
+      "state": "closed",
+      "createdAt": "2025-04-26T23:48:15Z",
+      "authorId": "user-125724364",
+      "repositoryId": "repo-MichaelPeng123-lahacks2025"
+    },
+    {
+      "id": "issue-3022308208",
+      "number": 4,
+      "title": "test issue",
+      "body": "testing if it shows up on the webhook",
+      "state": "open",
+      "createdAt": "2025-04-26T20:57:08Z",
+      "authorId": "user-32288183",
+      "repositoryId": "repo-MichaelPeng123-lahacks2025"
     }
   ]
 }
