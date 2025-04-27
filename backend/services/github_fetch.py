@@ -580,7 +580,8 @@ def fetch_and_save_all_issues(owner: str, repo: str, output_file: str = "collect
 # Function to fetch all pull requests and issues, combining them into one dataset
 def fetch_and_save_all_pr_and_issues(owner: str, repo: str, output_file: str = "collective.json") -> Dict[str, Any]:
     """
-    Fetch all pull requests and issues for a repository and save them to a JSON file.
+    Fetch all pull requests and issues for a repository and add them to an existing JSON file
+    or create a new one if it doesn't exist.
     
     Args:
         owner: Repository owner/organization
@@ -605,59 +606,89 @@ def fetch_and_save_all_pr_and_issues(owner: str, repo: str, output_file: str = "
         pull_requests = fetcher.fetch_all_pull_requests()
         issues = fetcher.fetch_all_issues()
         
-        # Create result object with the specified structure and order
-        result = {
-            "users": contributors,
-            "repositories": [repository],
-            "pullRequests": pull_requests,
-            "issues": issues
-        }
-        
-        # Add metadata outside the core data structure
-        metadata = {
-            "repository": f"{owner}/{repo}",
-            "timestamp": datetime.now().isoformat(),
-            "contributors_count": len(contributors),
-            "pull_requests_count": len(pull_requests),
-            "issues_count": len(issues)
-        }
-        
-        # Save to JSON file
-        with open(output_file, 'w') as f:
-            json.dump(result, f, indent=2)
-        
-        print(f"Saved {len(contributors)} contributors, 1 repository, {len(pull_requests)} pull requests, and {len(issues)} issues to {output_file}")
-        
-        return {**result, **metadata}
-    except Exception as e:
-        error_msg = f"Error fetching repository data: {str(e)}"
-        print(error_msg)
-        
-        # Save error information
-        error_result = {
-            "repository": f"{owner}/{repo}",
-            "timestamp": datetime.now().isoformat(),
-            "error": error_msg,
+        # Check if the file exists and load existing data
+        existing_data = {
             "users": [],
             "repositories": [],
             "pullRequests": [],
             "issues": []
         }
         
+        if os.path.exists(output_file):
+            try:
+                with open(output_file, 'r') as f:
+                    existing_data = json.load(f)
+                print(f"Loaded existing data from {output_file}")
+            except json.JSONDecodeError:
+                print(f"Error parsing {output_file}, creating new file")
+        
+        # Merge new data with existing data
+        # For users (avoid duplicates by id)
+        existing_user_ids = {user.get("id") for user in existing_data.get("users", [])}
+        for user in contributors:
+            if user.get("id") not in existing_user_ids:
+                existing_data["users"].append(user)
+                existing_user_ids.add(user.get("id"))
+        
+        # For repositories (avoid duplicates by id)
+        existing_repo_ids = {repo.get("id") for repo in existing_data.get("repositories", [])}
+        if repository.get("id") not in existing_repo_ids:
+            existing_data["repositories"].append(repository)
+        
+        # For pull requests (avoid duplicates by id)
+        existing_pr_ids = {pr.get("id") for pr in existing_data.get("pullRequests", [])}
+        for pr in pull_requests:
+            if pr.get("id") not in existing_pr_ids:
+                existing_data["pullRequests"].append(pr)
+                existing_pr_ids.add(pr.get("id"))
+        
+        # For issues (avoid duplicates by id)
+        existing_issue_ids = {issue.get("id") for issue in existing_data.get("issues", [])}
+        for issue in issues:
+            if issue.get("id") not in existing_issue_ids:
+                existing_data["issues"].append(issue)
+                existing_issue_ids.add(issue.get("id"))
+        
+        # Save the updated data back to the file
         with open(output_file, 'w') as f:
-            json.dump(error_result, f, indent=2)
+            json.dump(existing_data, f, indent=2)
+        
+        print(f"Updated {output_file} with new data:")
+        print(f"- Users: {len(existing_data['users'])} (added {len(contributors) - len(existing_user_ids.intersection([u.get('id') for u in contributors]))})")
+        print(f"- Repositories: {len(existing_data['repositories'])}")
+        print(f"- Pull Requests: {len(existing_data['pullRequests'])} (added {len(pull_requests) - len(existing_pr_ids.intersection([pr.get('id') for pr in pull_requests]))})")
+        print(f"- Issues: {len(existing_data['issues'])} (added {len(issues) - len(existing_issue_ids.intersection([i.get('id') for i in issues]))})")
+        
+        # Add metadata for return value
+        metadata = {
+            "repository": f"{owner}/{repo}",
+            "timestamp": datetime.now().isoformat()
+        }
+        
+        return {**existing_data, **metadata}
+    except Exception as e:
+        error_msg = f"Error fetching repository data: {str(e)}"
+        print(error_msg)
+        
+        # Create error result but don't overwrite existing file
+        error_result = {
+            "repository": f"{owner}/{repo}",
+            "timestamp": datetime.now().isoformat(),
+            "error": error_msg
+        }
         
         return error_result
 
 # Updated function to fetch all data in the specified format
 def fetch_and_save_all_github_data(owner: str, repo: str, output_file: str = "collective.json") -> Dict[str, Any]:
     """
-    Fetch all GitHub data (contributors, repository, pull requests, issues) in the specified format.
+    Fetch all GitHub data (contributors, repository, pull requests, issues) and add them to
+    an existing collective.json file or create a new one if it doesn't exist.
     
     Args:
         owner: Repository owner/organization
         repo: Repository name
-        output_file: Path to save the JSON file (default: collective.json)
+        output_file: Path to the JSON file to update (default: collective.json)
         
     Returns:
         Dictionary with all GitHub data in the required format

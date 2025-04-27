@@ -71,21 +71,6 @@ def process_all_nodes(data: Dict[str, Any], embedding_service: EmbeddingService)
 
 def main():
     # First fetch the latest GitHub data from the API
-
-    print("Fetching latest GitHub data from API...")
-    try:
-        response = requests.get("http://127.0.0.1:8000/fetch-github-data/MichaelPeng123/lahacks2025")
-        if response.status_code == 200:
-            print(f"Successfully fetched GitHub data: {response.json().get('message', '')}")
-        else:
-            print(f"Failed to fetch GitHub data: {response.status_code}")
-            print("Stopping execution - cannot proceed without fresh GitHub data")
-            sys.exit(1)  # Exit with error code
-    except Exception as e:
-        print(f"Error calling GitHub data endpoint: {str(e)}")
-        print("Stopping execution - cannot proceed without fresh GitHub data")
-
-    
     # Only continue here if GitHub data was successfully fetched
     
     print("GitHub data successfully fetched, continuing with process...")
