@@ -33,7 +33,7 @@
       "number": 26,
       "title": "integrated github fetching with mock data",
       "body": "integrated fetching of github repo history with knowledge graph data",
-      "state": "open",
+      "state": "closed",
       "createdAt": "2025-04-27T07:42:32Z",
       "authorId": "user-32288183",
       "repositoryId": "repo-MichaelPeng123-lahacks2025"
@@ -250,6 +250,26 @@
     }
   ],
   "issues": [
+    {
+      "id": "issue-3022936064",
+      "number": 28,
+      "title": "Github Repository Collective Fetch",
+      "body": "fetching the entirety of a repo's issues, prs, contributors and commit history, and integrating it with the knowledge graph ",
+      "state": "open",
+      "createdAt": "2025-04-27T08:44:02Z",
+      "authorId": "user-32288183",
+      "repositoryId": "repo-MichaelPeng123-lahacks2025"
+    },
+    {
+      "id": "issue-3022935444",
+      "number": 27,
+      "title": "Integrating Webhook with Github Actions",
+      "body": "Integration of webhook for github pull requests, issues, and other interactions",
+      "state": "open",
+      "createdAt": "2025-04-27T08:42:47Z",
+      "authorId": "user-32288183",
+      "repositoryId": "repo-MichaelPeng123-lahacks2025"
+    },
     {
       "id": "issue-3022876084",
       "number": 25,
