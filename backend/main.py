@@ -70,7 +70,7 @@ def ensure_process_directories():
     
     # Define file paths that need to exist
     required_files = {
-        'backend/processTools/mock.json': 'processTools/mock.json',
+        'processTools/mock.json': 'processTools/mock.json',
         'processTools/mock.json': None,  # Create empty if doesn't exist
     }
     
