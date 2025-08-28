@@ -1,4 +1,4 @@
-
+### DEVPOST: https://devpost.com/software/devatlas-32ewbz
 ### 💡 Inspiration
 
 DevAtlas is inspired by the daily struggles of the 3 devs on this project (the product designer is writing this :D). They face the bottleneck of spending over 4 hours per session trying to find which developer is behind the code. Based on our research, they are not alone...
